@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #FAF6EF;
+    --card: #FFFFFF;
+    --ink: #2A2320;
+    --sub: #6B5F55;
+    --gold: #B8863B;
+    --orange: #C2703D;
+    --red: #B23A2F;
+    --green: #4E7A51;
+    --line: #E7DCC9;
+    --cream: #F3E7D8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header.top { text-align: center; margin-bottom: 28px; }
+  header.top .eyebrow { color: var(--gold); font-weight: 700; letter-spacing: 1.5px; font-size: 12px; text-transform: uppercase; }
+  header.top h1 { font-size: 26px; margin: 6px 0 4px; }
+  header.top .sub { color: var(--sub); font-size: 14px; }
+  .statrow { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat { flex: 1; min-width: 140px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-align: center; }
+  .stat .num { font-size: 24px; font-weight: 800; color: var(--orange); }
+  .stat .lbl { font-size: 11px; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+  .theme-card { background: linear-gradient(135deg, #2A2320, #40342C); color: #F3E7D8; border-radius: 16px; padding: 20px 22px; margin-bottom: 26px; }
+  .theme-card .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #D8B87C; font-weight: 700; }
+  .theme-card h2 { margin: 6px 0 4px; font-size: 20px; }
+  .theme-card p { margin: 0; font-size: 13px; color: #D9CFC2; }
+  .progress-outer { background: #EFE3D0; border-radius: 999px; height: 10px; overflow: hidden; margin: 12px 0 4px; }
+  .progress-inner { background: var(--green); height: 100%; border-radius: 999px; transition: width .3s; }
+  h3.section { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin: 30px 0 12px; font-weight: 800; }
+  .day-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; }
+  .day-card.done { border-color: var(--green); background: #F3F8F3; }
+  .day-head { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .day-head-left { display: flex; align-items: center; gap: 10px; }
+  .day-badge { width: 34px; height: 34px; border-radius: 50%; background: var(--cream); color: var(--orange); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .day-card.done .day-badge { background: var(--green); color: #fff; }
+  .day-title { font-weight: 700; font-size: 15px; }
+  .day-sci { font-size: 12px; color: var(--sub); }
+  .chev { color: var(--sub); font-size: 12px; transition: transform .2s; }
+  .day-card.open .chev { transform: rotate(180deg); }
+  .day-body { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .day-card.open .day-body { display: block; }
+  .quote { font-style: italic; background: var(--cream); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 6px; font-size: 13.5px; margin: 10px 0; }
+  .quote small { display: block; font-style: normal; color: var(--sub); margin-top: 4px; }
+  .exp-title { font-weight: 700; font-size: 13px; margin-top: 12px; }
+  .exp-text { font-size: 13.5px; color: #4A4038; line-height: 1.5; }
+  .apply { font-size: 13.5px; color: #4A4038; line-height: 1.5; margin-top: 10px; background: #FBF8F2; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); }
+  .apply b { color: var(--orange); }
+  .checklist { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+  .check-item input { width: 16px; height: 16px; accent-color: var(--green); }
+  .check-item.checked span { text-decoration: line-through; color: var(--sub); }
+  .repertoire-box { margin-top: 14px; background: #EFF5F2; border: 1px solid #CFE3D8; border-radius: 10px; padding: 12px 14px; }
+  .repertoire-box .rep-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .repertoire-cat { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--green); background: #DCEEDF; padding: 2px 8px; border-radius: 999px; }
+  .repertoire-title { font-weight: 700; font-size: 13px; margin-top: 8px; }
+  .repertoire-text { font-size: 12.5px; color: #4A4038; line-height: 1.5; margin-top: 4px; }
+  .rep-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--sub); cursor: pointer; margin-top: 8px; }
+  .rep-check input { width: 14px; height: 14px; accent-color: var(--green); }
+  .rep-check.checked span { text-decoration: line-through; }
+  .friday { background: var(--card); border: 2px solid var(--orange); border-radius: 14px; padding: 18px 20px; margin-top: 8px; }
+  .friday-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .badge-status { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: .5px; }
+  .badge-ready { background: #E4F0E5; color: var(--green); }
+  .badge-wait { background: #F3E7D8; color: var(--orange); }
+  .script-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+  .script-top { display: flex; justify-content: space-between; gap: 10px; cursor: pointer; }
+  .script-type { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; background: var(--orange); padding: 2px 8px; border-radius: 999px; }
+  .script-title { font-weight: 700; font-size: 14.5px; margin-top: 6px; }
+  .script-hook { font-size: 13px; color: var(--sub); margin-top: 4px; }
+  .script-body { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13.5px; line-height: 1.6; color: #4A4038; }
+  .script-card.open .script-body { display: block; }
+  .cut { color: var(--red); font-weight: 700; font-style: italic; font-size: 12.5px; margin: 8px 0; }
+  .cta-box { background: var(--cream); border: 1px solid var(--gold); border-radius: 8px; padding: 10px 12px; margin: 10px 0; font-size: 13px; }
+  .cta-box b { color: var(--orange); }
+  .thumb-box { background: #F3F0EA; border-radius: 8px; padding: 10px 12px; font-size: 12.5px; color: var(--sub); }
+  table.history { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+  table.history th { text-align: left; color: var(--sub); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  table.history td { padding: 10px 8px; border-bottom: 1px solid var(--line); }
+  .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .pill-ok { background: #E4F0E5; color: var(--green); }
+  .pill-mid { background: #FBEFD9; color: var(--orange); }
+  .ebook-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  @media (max-width: 620px) { .ebook-grid { grid-template-columns: 1fr; } }
+  .ebook-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; position: relative; }
+  .ebook-card.next { border-color: var(--orange); }
+  .ebook-tag { position: absolute; top: -9px; right: 12px; background: var(--orange); color: #fff; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+  .ebook-title { font-weight: 700; font-size: 13.5px; }
+  .ebook-pitch { font-size: 12.5px; color: var(--sub); margin-top: 4px; }
+  footer.note { margin-top: 34px; font-size: 12px; color: var(--sub); text-align: center; line-height: 1.6; }
+  button.reset { display: block; margin: 18px auto 0; background: none; border: 1px solid var(--line); color: var(--sub); font-size: 11px; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Sistema de Conteúdo · Neurociência &amp; Neuromarketing</div>
+    <h1 id="weekTitle">Semana 1</h1>
+    <div class="sub" id="weekDates"></div>
+    <div class="sub" id="syncStatus" style="margin-top:6px;font-size:11px;">⏳ conectando...</div>
+    <button class="reset" id="refreshBtn" style="margin-top:8px;">🔄 Atualizar de outro aparelho</button>
+  </header>
+  <div class="statrow">
+    <div class="stat"><div class="num" id="statDaysWeek">0/5</div><div class="lbl">Dias estudados essa semana</div></div>
+    <div class="stat"><div class="num" id="statStreak">0</div><div class="lbl">Semanas completas seguidas</div></div>
+    <div class="stat"><div class="num" id="statTotalDays">0</div><div class="lbl">Estudos concluídos no total</div></div>
+    <div class="stat"><div class="num" id="statScripts">0</div><div class="lbl">Roteiros gerados no total</div></div>
+  </div>
+  <div class="theme-card">
+    <div class="lbl">Tema da semana</div>
+    <h2 id="themeTitle"></h2>
+    <p id="themeDesc"></p>
+    <div class="progress-outer"><div class="progress-inner" id="weekProgressBar" style="width:0%"></div></div>
+  </div>
+  <h3 class="section">Estudo diário · 20 minutos</h3>
+  <div id="days"></div>
+  <h3 class="section">Roteiros de sexta · gravar sábado</h3>
+  <div id="fridayBlock"></div>
+  <h3 class="section">Seus e-books · rotação de CTA</h3>
+  <div class="ebook-grid" id="ebookGrid"></div>
+  <h3 class="section">Evolução</h3>
+  <table class="history">
+    <thead><tr><th>Semana</th><th>Tema</th><th>Estudo</th><th>Roteiros</th></tr></thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+  <footer class="note">
+    Segunda a sexta chega um novo estudo automaticamente. Sexta, os 3 roteiros da semana são gerados aqui.<br>
+    Marque cada etapa conforme for estudando — isso fica salvo neste dispositivo.
+  </footer>
+  <button class="reset" onclick="if(confirm('Apagar todo o progresso salvo (em todos os aparelhos sincronizados)?')){localStorage.removeItem(LS_KEY);saveProgress({});render();}">Zerar progresso salvo</button>
+</div>
+<script>
+// ============ DATA — atualizado pelo Claude a cada semana ============
+const WEEKS = [
+  {
+    number: 1,
+    theme: "O cérebro não compra com a razão — ele compra com emoção e justifica depois",
+    themeDesc: "Base: hipótese do marcador somático (Damásio), Sistema 1/2 (Kahneman), inconsciente do consumidor (Zaltman), persuasão (Cialdini) e o circuito do medo (LeDoux).",
+    dateRange: "10–14 ago 2026 · gravação sábado 15 ago",
+    days: [
+      {
+        day: "Segunda", date: "10 ago",
+        scientist: "Antônio Damásio",
+        topic: "A hipótese do marcador somático",
+        quote: "Somos, antes de tudo, máquinas de sentir que pensam — não máquinas de pensar que sentem.",
+        quoteNote: "ideia central de Damásio, resumida em suas próprias entrevistas e em “O Erro de Descartes” (1994)",
+        experimentTitle: "O caso Elliot e o Iowa Gambling Task (Bechara & Damásio, 1994)",
+        experimentText: "Elliot perdeu parte do córtex pré-frontal ventromedial numa cirurgia. QI, memória e lógica intactos — mas ele não conseguia mais decidir nada sozinho. No Iowa Gambling Task, pessoas saudáveis desenvolvem uma resposta corporal (medida por resposta galvânica da pele) que as afasta dos baralhos ruins antes mesmo de saberem conscientemente por quê. Pacientes com dano na VMPFC nunca desenvolvem esse alerta — e continuam escolhendo mal, mesmo sabendo racionalmente que é ruim.",
+        apply: "Sem ativar uma sensação no corpo (alívio, aperto, orgulho), um argumento 100% lógico não fecha decisão nenhuma — só justifica depois.",
+        repertoire: {
+          category: "Astronomia",
+          title: "O primeiro exoplaneta encontrado ao redor de uma estrela como o Sol",
+          text: "Em 1995, os astrônomos suíços Michel Mayor e Didier Queloz detectaram o 51 Pegasi b, um planeta gigante gasoso orbitando uma estrela parecida com o Sol a 50 anos-luz da Terra. Foi a primeira confirmação desse tipo, e mudou a busca por vida fora do Sistema Solar — o feito rendeu a eles o Nobel de Física de 2019.",
+        },
+      },
+      {
+        day: "Terça", date: "11 ago",
+        scientist: "Daniel Kahneman",
+        topic: "Sistema 1 (rápido/emocional) vs. Sistema 2 (lento/racional)",
+        quote: "Nada na vida é tão importante quanto você pensa que é, enquanto você está pensando nisso.",
+        quoteNote: "citação real de Kahneman, “Rápido e Devagar” (2011)",
+        experimentTitle: "O experimento da roleta — efeito de ancoragem (Tversky & Kahneman, 1974)",
+        experimentText: "Uma roleta manipulada parava só em 10 ou 65. Ao perguntar quantos países africanos fazem parte da ONU, quem via 65 chutava valores bem mais altos que quem via 10 — mesmo sabendo que a roleta não tinha relação nenhuma com a pergunta. O Sistema 1 usa a primeira referência disponível, mesmo irrelevante.",
+        apply: "É por isso que 'de R$497 por R$197' ancora a percepção de valor antes da pessoa avaliar racionalmente se vale R$197.",
+        repertoire: {
+          category: "História",
+          title: "O primeiro transplante de coração bem-sucedido do mundo",
+          text: "Em 3 de dezembro de 1967, o cirurgião sul-africano Christiaan Barnard realizou o primeiro transplante de coração humano para humano, na Cidade do Cabo. O paciente, Louis Washkansky, sobreviveu 18 dias antes de morrer de pneumonia (o sistema imunológico dele estava suprimido pelos remédios anti-rejeição). O feito abriu caminho pra transplantes cardíacos se tornarem rotina décadas depois.",
+        },
+      },
+      {
+        day: "Quarta", date: "12 ago",
+        scientist: "Gerald Zaltman",
+        topic: "95% da decisão acontece fora da consciência",
+        quote: "A maior parte do pensamento, emoção e aprendizado acontece sem que a pessoa tenha consciência disso.",
+        quoteNote: "estimativa central de Zaltman em “How Customers Think” (2003), Harvard",
+        experimentTitle: "ZMET — Zaltman Metaphor Elicitation Technique",
+        experimentText: "Zaltman desenvolveu uma técnica que usa metáforas e imagens (não perguntas diretas) para acessar motivações de compra que o próprio consumidor não sabe verbalizar. Pesquisa de opinião direta (“o que você prefere?”) sistematicamente erra porque o consumidor não tem acesso consciente ao próprio motivo.",
+        apply: "Perguntar diretamente ao público 'o que você quer ver' é o pior jeito de descobrir o que realmente vai prender atenção.",
+        repertoire: {
+          category: "Notícia · Astronomia",
+          title: "O tríplice evento astronômico de 12 de agosto de 2026",
+          text: "Nesta quarta-feira desta semana, um eclipse solar total foi visível na Europa, coincidindo com o pico da chuva de meteoros Perseidas e um raro alinhamento de seis planetas no céu (Mercúrio, Marte, Júpiter, Saturno, Urano e Netuno). No Brasil, deu pra ver o desfile planetário na madrugada e as Perseidas à noite. Fica de olho: no fim do mês (27–28 de agosto) tem eclipse lunar cobrindo 93% da Lua, visível a olho nu em qualquer cidade do país.",
+        },
+      },
+      {
+        day: "Quinta", date: "13 ago",
+        scientist: "Robert Cialdini",
+        topic: "Prova social específica vence prova social genérica",
+        quote: "Vemos um comportamento como mais correto quando o observamos em outros — especialmente em pessoas parecidas conosco.",
+        quoteNote: "princípio central de Cialdini em “As Armas da Persuasão”",
+        experimentTitle: "O estudo das toalhas de hotel (Goldstein, Cialdini & Griskevicius, 2008)",
+        experimentText: "Placas com “75% dos hóspedes DESTE QUARTO reutilizaram a toalha” geraram significativamente mais reuso do que o apelo ambiental genérico. Quanto mais específica e parecida com o contexto do observador, mais forte a norma social.",
+        apply: "'Alunos satisfeitos' é fraco. 'A Marina, que também travava pra gravar, gravou o primeiro vídeo em 3 dias' é forte — porque é específico e parecido com quem assiste.",
+        repertoire: {
+          category: "Ciência",
+          title: "O bicho que sobrevive no vácuo do espaço",
+          text: "Em 2007, a Agência Espacial Europeia lançou o experimento TARDIS, expondo tardígrados (microanimais de menos de 1mm) ao vácuo espacial e à radiação solar direta, sem proteção nenhuma, por 10 dias. Muitos sobreviveram e ainda conseguiram se reproduzir depois de voltar à Terra — o único animal conhecido capaz disso até hoje.",
+        },
+      },
+      {
+        day: "Sexta", date: "14 ago",
+        scientist: "Joseph LeDoux",
+        topic: "A via rápida da amígdala",
+        quote: "As conexões dos sistemas emocionais para os sistemas cognitivos são mais fortes do que as conexões dos sistemas cognitivos para os emocionais.",
+        quoteNote: "ideia central de LeDoux em “The Emotional Brain” (1996)",
+        experimentTitle: "Duas vias até a amígdala",
+        experimentText: "Um estímulo de ameaça pode chegar à amígdala por uma via lenta (tálamo → córtex → amígdala, que analisa e pondera) ou por uma via rápida (tálamo → amígdala direto, sem passar pelo córtex). A via rápida existe por sobrevivência — reagir mais rápido pode significar viver. Ela dispara antes da parte racional processar conscientemente.",
+        apply: "Urgência real (vaga que realmente acaba) ativa decisão antes da pessoa 'pensar demais e desistir'. Urgência falsa funciona uma vez só — depois quebra a confiança.",
+        repertoire: {
+          category: "Astronomia",
+          title: "A China mira o polo sul da Lua",
+          text: "Agosto de 2026 é a janela mais provável de lançamento da missão chinesa Chang'e 7, rumo ao polo sul lunar. Ela leva um orbitador, um módulo de pouso, um rover e um robozinho saltador, todos com a missão de procurar gelo de água na região — um recurso que pode viabilizar futuras bases lunares permanentes.",
+        },
+      },
+    ],
+    scriptsReady: true,
+    scripts: [
+      {
+        type: "Curiosidade",
+        title: "O paciente que perdeu a capacidade de decidir depois que “curaram” suas emoções",
+        hook: "Deixa eu te contar uma coisa que vai bagunçar um pouco a tua cabeça. Aquele conselho de “não deixa a emoção atrapalhar a decisão”? Pois é... uma baita mentira.",
+        ebook: "Chega — de uma vida sem graça",
+        body: [
+          "GANCHO (0:00–0:30): Deixa eu te contar uma coisa que vai bagunçar um pouco a tua cabeça. Você já deve ter ouvido aquele conselho clássico: “não deixa a emoção atrapalhar a decisão, seja racional”. Pois é... isso é, com todo o respeito, uma baita mentira. E não sou eu que tô dizendo, é um dos neurocientistas mais respeitados do mundo — que escreveu um livro inteiro só pra provar isso, contando a história de um paciente que perdeu a parte emocional do cérebro numa cirurgia e virou incapaz de decidir até qual caneta usar. Fica comigo até o final, porque isso muda como você vende, como você ensina e como você entende toda decisão que já tomou na vida.",
+          "CUT::Corte reel — o gancho inteiro funciona sozinho (0:00–0:30)",
+          "DESENVOLVIMENTO: O nome do paciente, no relato, é Elliot. Quem descreve o caso é Antônio Damásio, no livro “O Erro de Descartes” — se você já me acompanha há um tempo, sabe que ele é o meu neurocientista favorito, e não é à toa.",
+          "Elliot fez uma cirurgia pra remover um tumor perto do córtex pré-frontal ventromedial — bem atrás da testa. Tiraram o tumor e, junto, um pedacinho dessa região. Resultado nos testes de QI, memória e linguagem: tudo impecável. No papel, ele continuava brilhante.",
+          "Só que, na vida real, virou um caos: ficava horas pra escolher entre duas canetas, perdia prazo, perdia dinheiro em decisão ruim atrás de decisão ruim — sempre com uma calma esquisita, como quem comenta o tempo lá fora. Listava prós e contras perfeitamente. Só não conseguia chegar numa decisão boa.",
+          "Foi aí que Damásio percebeu: Elliot tinha parado de sentir. Surge a pergunta que virou o motor da carreira dele: e se a emoção não for o problema da decisão — e sim a base dela?",
+          "Junto com o pesquisador Antoine Bechara, ele criou um teste que hoje é clássico: o Iowa Gambling Task, de 1994. Quatro baralhos na mesa. Dois parecem ótimos, mas no total dão prejuízo. Dois parecem menores, mas no total dão lucro. Ninguém sabe disso de cara.",
+          "Gente saudável, depois de umas 40 ou 50 cartas, começa a evitar os baralhos ruins — antes mesmo de conseguir explicar o porquê. Os pesquisadores mediam a resposta da pele, tipo um detector de mentira simplificado, e essa resposta disparava toda vez que a mão ia em direção ao baralho ruim. Antes da escolha consciente. O corpo já sabia. A cabeça ainda não tinha se atualizado.",
+          "CUT::Corte reel — trecho do Iowa Gambling Task, ótimo microconteúdo (~50s)",
+          "Pacientes como Elliot nunca desenvolviam esse alerta. Continuavam escolhendo mal, repetidamente, mesmo sabendo racionalmente que era ruim. Saber não bastava — sem o aviso do corpo, a razão sozinha não segurava a decisão.",
+          "Daqui nasce a Hipótese do Marcador Somático: a gente decide guiado por marcadores emocionais no corpo — um aperto, um alívio, um desconforto — que aparecem antes de qualquer análise consciente. Não é força de vontade, é biologia. E olha, isso até lembra aquela ideia estoica de separar o que tá sob seu controle do que não tá: você não controla sentir o marcador — ele já vem. O que você controla é o que faz depois que ele aparece.",
+          "APLICAÇÃO REAL: Agora traz isso pro seu conteúdo. Se decisão depende de sentir antes de racionalizar, um anúncio 100% dado e funcionalidade nunca fecha venda sozinho — ele fala com a parte do cérebro que só entra depois, pra justificar o que o corpo já decidiu.",
+          "Repara a diferença: “Nosso curso tem 40 aulas, certificado e suporte.” Versus: “Você já ficou virada na cama sabendo que o boleto vence amanhã e não tem certeza se vai dar conta?” O segundo já ativa um marcador — um aperto real. Só depois disso a lista de funcionalidades faz sentido.",
+          "CUT::Corte reel — contraste dos dois anúncios (~40s)",
+          "Isso não é manipular. É respeitar como decisão humana funciona de verdade — o que a ciência mostra há 30 anos e boa parte do marketing ainda finge que não sabe.",
+          "CTA::Chega — de uma vida sem graça::Isso não vale só pra vender produto, viu. Vale pra sua própria vida também. Se você trava até nas decisões pequenas do seu dia, não é falta de força de vontade — é o mesmo circuito, numa versão mais leve. No “Chega” eu trago o Método V.I.D.A., 4 passos pra sair do automático e decidir com clareza de novo. Link na descrição.",
+          "FECHAMENTO: Agora me conta aqui embaixo: você lembra de alguma decisão sua — grande ou pequena — que foi emoção primeiro, e a lógica só veio depois como desculpa? Quero muito ler. E se esse tipo de conteúdo faz sentido pra você, segue aqui, toda semana tem estudo novo.",
+          "CUT::Corte reel — fechamento + pergunta (~30s)",
+          "THUMB::Close no rosto com expressão de confusão/paralisia + texto grande “ELE NÃO CONSEGUIA MAIS ESCOLHER NEM UMA CANETA”. Fundo escuro, texto amarelo/branco de alto contraste.",
+        ],
+      },
+      {
+        type: "Método",
+        title: "3 gatilhos neurocientíficos pra vender sem parecer que tá vendendo",
+        hook: "Deixa eu adivinhar: você já testou uns “gatilhos mentais” de story e não funcionou muito bem, né? É porque não tinha nada de científico.",
+        ebook: "Acorde Cedo — Método Lucidez",
+        body: [
+          "GANCHO (0:00–0:30): Deixa eu adivinhar: você já testou uns “gatilhos mentais” que viu em algum story e não funcionou muito bem, né? Isso provavelmente aconteceu porque o gatilho não tinha nada de científico — era só um nome bonito pra alguma coisa vazia. Hoje eu vou te mostrar 3 gatilhos que a neurociência já comprovou, com experimento, autor e data. Nada de achismo de guru de internet.",
+          "CUT::Corte reel — gancho (0:00–0:30)",
+          "GATILHO 1 — ANCORAGEM: Kahneman e Tversky, 1974, o famoso experimento da roleta manipulada — parava só em 10 ou 65. Perguntavam: “quantos países africanos fazem parte da ONU?” Quem via 65 chutava bem mais alto que quem via 10 — mesmo sabendo, racionalmente, que a roleta não tinha nada a ver com a resposta.",
+          "CUT::Corte reel — experimento da roleta (~45s)",
+          "O cérebro usa a primeira referência disponível, mesmo sendo irrelevante. É por isso que “de R$497 por R$197” pesa mais que só “R$197”. Não é o preço final que muda a percepção — é a âncora que aparece antes.",
+          "GATILHO 2 — PROVA SOCIAL ESPECÍFICA: Goldstein, Cialdini e Griskevicius, 2008, publicado na Journal of Consumer Research. Placas de hotel: uma dizia “ajude o meio ambiente”, outra dizia “75% dos hóspedes DESTE QUARTO reutilizaram a toalha”. A segunda bateu a primeira, e não foi pouco.",
+          "CUT::Corte reel — estudo da toalha (~50s)",
+          "Repara o detalhe: não foi “a maioria das pessoas” — foi “as pessoas que estiveram exatamente onde você tá agora”. “10 mil alunos satisfeitos” é fraco. Um exemplo específico, parecido com quem tá assistindo, é forte.",
+          "GATILHO 3 — VIA RÁPIDA DA AMÍGDALA: Joseph LeDoux, da NYU, mostrou que existe uma rota direta do tálamo até a amígdala — sem passar pelo córtex, que é mais lento e analítico. Ela dispara antes da parte racional processar.",
+          "APLICAÇÃO REAL: Urgência real — vaga que realmente acaba — ativa decisão antes da pessoa “pensar demais e sumir”. Só que aqui eu preciso ser bem direta: só funciona, e só deve ser usada, quando é verdade. Urgência falsa funciona uma vez. Na segunda, a pessoa percebe, e aí é sua credibilidade que vai embora.",
+          "CUT::Corte reel — a ressalva sobre urgência falsa (~40s)",
+          "Resumindo: ancoragem molda percepção de preço, prova social específica constrói confiança mais rápido, urgência real acelera decisão. Nenhum é truque — é o mesmo mecanismo que seu cérebro usa o dia inteiro.",
+          "CTA::Acorde Cedo — Método Lucidez::E se o seu problema nem é falta de gatilho — é falta de energia pra sequer sentar e gravar — vale olhar pro outro lado: o guia “Acorde Cedo” te ajuda a achar SEU horário de pico segundo seu cronotipo, não o horário que o coach do Instagram disse que é certo. Link aqui embaixo.",
+          "FECHAMENTO: Guarda os três: ancoragem, prova social específica, urgência real. Testa um essa semana e comenta aqui qual foi — quero ver na prática.",
+          "THUMB::3 ícones numerados (cérebro / aperto de mão / relógio) + texto “3 GATILHOS QUE A CIÊNCIA PROVOU (E NÃO SÃO TRUQUE)”.",
+        ],
+      },
+      {
+        type: "Livro",
+        title: "O Erro de Descartes — o livro que prova que separar razão de emoção foi um erro",
+        hook: "“Penso, logo existo.” Um dos maiores neurocientistas vivos escreveu um livro inteiro pra provar que essa frase está errada pro cérebro humano.",
+        ebook: "Divorciei! E agora?",
+        body: [
+          "GANCHO (0:00–0:30): “Penso, logo existo” — a frase mais famosa da filosofia ocidental. E um dos maiores neurocientistas vivos escreveu um livro inteiro só pra provar que ela tá errada pro cérebro humano. O nome do livro já entrega: “O Erro de Descartes”. E o argumento dele vai bagunçar como você entende toda decisão que já tomou — inclusive as de compra.",
+          "CUT::Corte reel — gancho (0:00–0:30)",
+          "DESENVOLVIMENTO: Antônio Damásio lançou esse livro em 1994 — e sim, ele é o meu neurocientista favorito, então prepara que ele vai aparecer bastante por aqui. A tese central: a tradição ocidental, desde Descartes, tratou razão e emoção como coisas separadas — razão nobre, emoção ruído.",
+          "Só que, na prática clínica, Damásio via o oposto: pacientes que perdiam a capacidade de sentir não ficavam mais racionais — ficavam incapazes de decidir. QI intacto, vida real desmoronando.",
+          "Do livro, saem três aprendizados que eu uso toda semana pra criar conteúdo: primeiro, racionalidade pura não existe na prática — todo argumento lógico já passou por um filtro emocional antes. Segundo, o corpo decide antes da consciência perceber — o “instinto” que acerta rápido não é sorte. Terceiro, ensinar ou vender só com dado é ir contra a arquitetura do cérebro — dado sem emoção não gruda.",
+          "CUT::Corte reel — os 3 aprendizados em bloco (~50s)",
+          "APLICAÇÃO REAL: Na prática, isso muda como eu monto qualquer roteiro — inclusive esse aqui: sempre abro com uma cena ou sensação real, antes de qualquer dado ou nome de pesquisador. O dado sustenta, não abre. Vale pra qualquer área: conteúdo, venda, aula, liderança — comece pela sensação, feche com a lógica.",
+          "CTA::Divorciei! E agora?::Essa briga entre cabeça e peito fica ainda mais clara nas decisões grandes da vida — tipo recomeçar depois de um divórcio, quando a razão diz uma coisa e o corpo grita outra. Se é o seu momento agora, o guia “Divorciei! E Agora?” traz os primeiros passos pra se reencontrar sem se perder de si. Link aqui embaixo.",
+          "FECHAMENTO: “O Erro de Descartes” não é leitura fácil, mas é essencial se você quer entender decisão humana de verdade. Já leu? Conta aqui embaixo. E se você quer mais neurociência aplicada, sem enrolação, o canal é aqui.",
+          "THUMB::Capa de livro estilizada + rosto em expressão de choque/reflexão + texto “ESSE LIVRO DESTRÓI ‘PENSO, LOGO EXISTO’”.",
+        ],
+      },
+    ],
+  },
+  {
+    number: 2,
+    theme: "O cérebro não registra o que aconteceu — registra a história, a repetição e o preço que vieram junto",
+    themeDesc: "Base: oxitocina e narrativa (Zak), efeito de mera exposição (Zajonc), memória reconstrutiva (Loftus), teoria do gap de curiosidade (Loewenstein) e o efeito do preço na experiência neural de prazer (Plassmann & Shiv).",
+    dateRange: "17–21 ago 2026 · gravação sábado 22 ago",
+    days: [
+      {
+        day: "Segunda", date: "17 ago",
+        scientist: "Paul Zak",
+        topic: "Histórias com tensão emocional liberam oxitocina — e isso muda o comportamento",
+        quote: "Histórias com começo, tensão real e resolução fazem o cérebro liberar oxitocina — e isso muda o quanto a pessoa confia e o quanto ela doa depois.",
+        quoteNote: "ideia central de Paul Zak, resumida de sua pesquisa sobre oxitocina e narrativa (Harvard Business Review, 2014, “Why Your Brain Loves Good Storytelling”)",
+        experimentTitle: "O vídeo do pai e o filho com câncer (Zak, 2013–2015)",
+        experimentText: "Zak e sua equipe mostraram a voluntários um vídeo real de dois minutos: um pai contando a rotina de cuidar do filho de 2 anos em tratamento contra um câncer terminal. Antes e depois do vídeo, colheram sangue para medir oxitocina e cortisol. Quanto mais oxitocina liberada durante a história, mais dinheiro a pessoa doava depois, de forma voluntária, para estranhos em um jogo econômico — e essa correlação era mais forte que qualquer dado demográfico coletado.",
+        apply: "Um vídeo que abre com dado ou funcionalidade não libera esse composto. Um vídeo que abre com uma pessoa real, em tensão real, sim — é por isso que a história vem antes do dado, sempre.",
+        repertoire: {
+          category: "Ciência",
+          title: "A descoberta da penicilina",
+          text: "Em 1928, o bacteriologista escocês Alexander Fleming notou que um fungo (Penicillium notatum) que contaminou por acidente uma de suas placas de cultura estava matando as bactérias ao redor. Ele quase descartou a placa como erro de laboratório. Essa observação virou a penicilina, o primeiro antibiótico em massa da história — antes dela, uma infecção comum podia matar em poucos dias.",
+        },
+      },
+      {
+        day: "Terça", date: "18 ago",
+        scientist: "Robert Zajonc",
+        topic: "O efeito de mera exposição — familiaridade vira preferência, mesmo sem reconhecimento consciente",
+        quote: "A repetição de um estímulo, por si só, já é suficiente para aumentar a atitude positiva da pessoa em relação a ele.",
+        quoteNote: "conclusão central de Zajonc em “Attitudinal Effects of Mere Exposure”, Journal of Personality and Social Psychology (1968)",
+        experimentTitle: "Caracteres chineses e palavras sem sentido (Zajonc, 1968)",
+        experimentText: "Zajonc mostrou a participantes que não liam chinês uma série de ideogramas e palavras inventadas — cada estímulo aparecendo de 1 a 25 vezes, em ordem aleatória. Depois, pediu para avaliarem o quanto gostavam de cada símbolo. Resultado: quanto mais vezes um símbolo tinha aparecido, mais ele era avaliado como agradável — mesmo os participantes não conseguindo dizer conscientemente quais tinham visto mais.",
+        apply: "É por isso que aparecer toda semana, mesmo sem 'viralizar', constrói preferência de marca de um jeito que um único vídeo perfeito nunca constrói sozinho.",
+        repertoire: {
+          category: "História",
+          title: "A primeira mensagem telegráfica de longa distância",
+          text: "Em 24 de maio de 1844, Samuel Morse enviou a primeira mensagem telegráfica pública entre Washington e Baltimore: “What hath God wrought” (“Que maravilha Deus fez”), uma frase bíblica escolhida pela filha de um amigo. O telégrafo elétrico reduziu uma comunicação que levava dias, por carta ou cavalo, para poucos segundos — e é considerado o marco que iniciou a era da comunicação instantânea.",
+        },
+      },
+      {
+        day: "Quarta", date: "19 ago",
+        scientist: "Elizabeth Loftus",
+        topic: "A memória não é gravação — é reconstrução, e pode ser editada por uma palavra",
+        quote: "A memória funciona um pouco como uma página da Wikipédia: você pode editá-la, e outras pessoas também podem.",
+        quoteNote: "metáfora usada por Loftus em entrevistas e palestras (incluindo seu TED Talk de 2013) para descrever seus achados sobre memória reconstrutiva",
+        experimentTitle: "O estudo do acidente de carro (Loftus & Palmer, 1974)",
+        experimentText: "Participantes assistiram ao mesmo vídeo de uma colisão de carros. Depois, foram perguntados sobre a velocidade dos carros — mas o verbo usado na pergunta mudava entre grupos: 'esbarraram', 'bateram', 'colidiram', 'se estraçalharam'. Quem ouviu 'estraçalharam' estimou velocidades bem mais altas — e, uma semana depois, teve mais chance de 'lembrar' de vidro quebrado na cena, que simplesmente não existia no vídeo original.",
+        apply: "A palavra que você usa pra descrever a dor ou o problema do seu público não só comunica — ela literalmente participa da reconstrução da lembrança que a pessoa tem da própria experiência.",
+        repertoire: {
+          category: "Astronomia",
+          title: "O Disco de Ouro da Voyager",
+          text: "Em 1977, a Nasa lançou as sondas Voyager 1 e 2, cada uma carregando um disco de ouro banhado com sons e imagens da Terra — línguas, música, batimento cardíaco humano — pensado para durar mais de 1 bilhão de anos. A Voyager 1 é hoje o objeto feito pelo homem mais distante da Terra, já no espaço interestelar, a mais de 24 bilhões de km de distância.",
+        },
+      },
+      {
+        day: "Quinta", date: "20 ago",
+        scientist: "George Loewenstein",
+        topic: "A curiosidade nasce de um vazio entre o que você sabe e o que quer saber",
+        quote: "A curiosidade acontece quando a atenção se fixa em uma lacuna no próprio conhecimento — essa lacuna gera uma sensação de privação que a pessoa quer resolver.",
+        quoteNote: "síntese da teoria de Loewenstein em “The Psychology of Curiosity: A Review and Reinterpretation”, Psychological Bulletin (1994)",
+        experimentTitle: "A teoria do information gap",
+        experimentText: "Loewenstein revisou décadas de estudos sobre curiosidade e propôs que ela não depende do quanto você já sabe — depende do tamanho da lacuna percebida entre o que sabe e o que quer saber. Uma lacuna pequena demais não gera curiosidade (parece óbvio); uma lacuna grande demais também não (parece impossível de fechar, e a pessoa desiste). O ponto ideal é uma pergunta específica, que pareça alcançável de responder.",
+        apply: "'Vou te contar um estudo de neurociência' não abre lacuna nenhuma. 'Por que seu cérebro finge lembrar coisas que nunca aconteceram?' abre uma lacuna exata — e é isso que segura a pessoa até o final do vídeo.",
+        repertoire: {
+          category: "Ciência",
+          title: "A ferramenta que edita genes como texto",
+          text: "Em 2012, as cientistas Jennifer Doudna e Emmanuelle Charpentier publicaram o mecanismo do CRISPR-Cas9, um sistema encontrado originalmente em bactérias como defesa contra vírus, adaptado para cortar e editar DNA em qualquer organismo com alta precisão. A descoberta rendeu às duas o Nobel de Química de 2020 e abriu caminho para tratamentos genéticos hoje aprovados, como o da anemia falciforme.",
+        },
+      },
+      {
+        day: "Sexta", date: "21 ago",
+        scientist: "Hilke Plassmann & Baba Shiv",
+        topic: "O preço muda o prazer real que o cérebro sente — não é só percepção, é experiência",
+        quote: "Ações de marketing, como o preço, podem modular a própria experiência neural de prazer — não apenas o julgamento posterior sobre o produto.",
+        quoteNote: "conclusão central de Plassmann, O'Doherty, Rangel & Shiv, “Marketing Actions Can Modulate Neural Representations of Experienced Pleasantness”, PNAS (2008)",
+        experimentTitle: "O vinho de R$10 e o de R$90 que eram o mesmo vinho",
+        experimentText: "Voluntários provaram vinhos enquanto tinham o cérebro escaneado por ressonância magnética funcional. Disseram a eles que estavam bebendo vinhos de preços diferentes — mas era exatamente o mesmo vinho nas duas vezes. Quando achavam que estavam bebendo o vinho mais caro, relatavam mais prazer E o córtex orbitofrontal medial (ligado à experiência real de prazer, não só ao julgamento racional) mostrava mais atividade. O preço não mudou só a opinião — mudou a experiência sensorial registrada no cérebro.",
+        apply: "Baixar o preço pra 'facilitar a venda' pode literalmente diminuir o prazer que a pessoa sente com o que você vende. Preço não é só uma barreira de entrada — é um ingrediente da experiência.",
+        repertoire: {
+          category: "Astronomia",
+          title: "A primeira foto de um buraco negro",
+          text: "Em 10 de abril de 2019, o consórcio internacional Event Horizon Telescope divulgou a primeira imagem direta de um buraco negro — o supermassivo no centro da galáxia M87, a 55 milhões de anos-luz da Terra. A imagem, um anel alaranjado de gás em volta de uma sombra escura, foi montada a partir de dados de oito radiotelescópios espalhados pelo planeta, funcionando como um único telescópio do tamanho da Terra.",
+        },
+      },
+    ],
+    scriptsReady: true,
+    scripts: [
+      {
+        type: "Curiosidade",
+        title: "O estudo que provou que sua memória mente sem você perceber",
+        hook: "Se eu te perguntar sobre uma lembrança bem nítida da sua infância... tem uma chance real de uma parte dela nunca ter acontecido do jeito que você lembra. E não é força de expressão.",
+        ebook: "A Boa Moça Morreu",
+        body: [
+          "GANCHO (0:00–0:30): Se eu te perguntar sobre uma lembrança bem nítida da sua infância... tem uma chance real de uma parte dela nunca ter acontecido do jeito que você lembra. E isso não é força de expressão, nem “memória fraca”. Existe um estudo, de uma das psicólogas mais citadas do mundo, que provou isso com um detalhe simples: uma palavra diferente na pergunta. Fica comigo até o final, porque isso muda como você entende toda lembrança que você tem — inclusive as que usa pra se definir.",
+          "CUT::Corte reel — o gancho inteiro funciona sozinho (0:00–0:30)",
+          "DESENVOLVIMENTO: O nome dela é Elizabeth Loftus, psicóloga cognitiva americana, e o estudo é de 1974, feito com o colega John Palmer.",
+          "O experimento foi simples: todo mundo assistia ao mesmo vídeo de um acidente de carro. Só que, na hora de perguntar 'a que velocidade os carros estavam quando...', o verbo mudava entre grupos — pra uns era 'esbarraram', pra outros 'bateram', pra outros 'colidiram', pra outros 'se estraçalharam'.",
+          "Resultado: quem ouviu a versão mais dramática, 'estraçalharam', chutou uma velocidade bem mais alta que quem ouviu 'esbarraram'. Só uma palavra. Mas o mais impressionante veio uma semana depois.",
+          "CUT::Corte reel — o detalhe da palavra que muda a velocidade estimada (~40s)",
+          "Loftus voltou e perguntou: 'você viu vidro quebrado na cena?' Não tinha vidro quebrado nenhum no vídeo original. Mas quem tinha ouvido 'estraçalharam' teve muito mais chance de dizer que sim, que lembrava do vidro. A palavra usada na pergunta tinha, literalmente, editado a lembrança da pessoa — e inserido um detalhe que nunca existiu.",
+          "A partir daí, Loftus passou a carreira toda estudando isso: memória não é uma gravação guardada intacta em algum HD na sua cabeça. É uma reconstrução, feita de novo cada vez que você lembra — e cada reconstrução pode absorver um pedacinho do que aconteceu depois do fato original.",
+          "CUT::Corte reel — a explicação de 'memória como reconstrução' (~35s)",
+          "APLICAÇÃO REAL: Isso muda completamente como pensar em linguagem no seu conteúdo. A palavra que você escolhe pra descrever o problema do seu público não é só descrição — ela participa da reconstrução da lembrança que a pessoa tem da própria dor.",
+          "Repara a diferença: 'você já se sentiu cansada de tentar' versus 'você já sentiu o peito apertar de tanto tentar e não ver resultado'. A segunda frase não só descreve — ela adiciona uma sensação física à lembrança que a pessoa reconstrói na hora.",
+          "CUT::Corte reel — contraste das duas frases (~30s)",
+          "Isso também é um convite pra honestidade: se a memória é maleável, o cuidado com o que você planta na cabeça de alguém é ainda maior — usar isso pra vender algo que não entrega é o tipo de manipulação que a ciência nomeia, mas o marketing sério evita.",
+          "CTA::A Boa Moça Morreu::Isso vale pra como você reconstrói sua própria história também, viu. Muita gente carrega uma versão de si mesma — 'sempre fui a que resolve tudo pra todo mundo' — que nem sempre é fiel ao que realmente aconteceu, só à história que foi mais fácil de repetir. No 'A Boa Moça Morreu' eu falo sobre reescrever essa narrativa quando ela para de servir. Link na descrição.",
+          "FECHAMENTO: Me conta aqui embaixo: tem alguma lembrança sua que, pensando bem agora, você não tem 100% de certeza se foi exatamente assim? Quero muito ler. E se ciência aplicada ao dia a dia faz sentido pra você, segue aqui — toda semana tem estudo novo.",
+          "CUT::Corte reel — fechamento + pergunta (~25s)",
+          "THUMB::Rosto em expressão de dúvida/confusão + texto grande “SUA MEMÓRIA JÁ MENTIU PRA VOCÊ (E TEM PROVA CIENTÍFICA)”. Fundo escuro, texto branco/amarelo de alto contraste.",
+        ],
+      },
+      {
+        type: "Método",
+        title: "3 gatilhos de neurociência pra prender atenção sem precisar 'viralizar'",
+        hook: "Você não precisa de um vídeo viral pra vender. Precisa aparecer do jeito certo, repetidas vezes, com um vazio de curiosidade bem colocado. Hoje são 3 gatilhos comprovados, com estudo, autor e ano.",
+        ebook: "Chega — de uma vida sem graça",
+        body: [
+          "GANCHO (0:00–0:30): Você não precisa de um vídeo viral pra vender. Precisa aparecer do jeito certo, várias vezes, com um vazio de curiosidade bem colocado no gancho. Hoje eu trago 3 gatilhos que a ciência já comprovou — com estudo, autor e ano, sem achismo de guru.",
+          "CUT::Corte reel — gancho (0:00–0:30)",
+          "GATILHO 1 — MERA EXPOSIÇÃO: Robert Zajonc, 1968, Journal of Personality and Social Psychology. Ele mostrou caracteres chineses e palavras inventadas pra gente que não lia chinês, de 1 a 25 vezes cada. Quanto mais vezes o símbolo aparecia, mais a pessoa dizia gostar dele — mesmo sem lembrar conscientemente de ter visto mais.",
+          "CUT::Corte reel — o experimento dos caracteres chineses (~40s)",
+          "Isso significa que aparecer toda semana, mesmo sem 'bombar', constrói preferência de um jeito que nenhum vídeo isolado, por melhor que seja, constrói sozinho.",
+          "GATILHO 2 — O VAZIO DE CURIOSIDADE: George Loewenstein, 1994, Psychological Bulletin. A teoria dele diz que curiosidade nasce de uma lacuna percebida entre o que você sabe e o que quer saber — nem pequena demais (parece óbvio), nem grande demais (parece impossível).",
+          "CUT::Corte reel — explicação do information gap (~35s)",
+          "Na prática: um gancho tipo 'hoje vou falar de neurociência' não abre vazio nenhum. Um gancho tipo 'por que seu cérebro finge lembrar coisa que nunca aconteceu' abre uma lacuna específica — e é isso que segura a atenção.",
+          "GATILHO 3 — O PREÇO MUDA A EXPERIÊNCIA: Plassmann, O'Doherty, Rangel e Shiv, PNAS, 2008. Voluntários provaram o mesmo vinho duas vezes, achando que eram vinhos de preços diferentes. Quando achavam que era o caro, relatavam mais prazer — e o cérebro mostrava mais atividade na área ligada à experiência real de prazer, não só à opinião.",
+          "CUT::Corte reel — o experimento do vinho (~45s)",
+          "APLICAÇÃO REAL: Preço barato pra 'facilitar a venda' pode diminuir o prazer real que a pessoa sente com o que ela comprou. Isso não quer dizer cobrar caro por cobrar — quer dizer que preço é parte da experiência, não só uma barreira antes dela.",
+          "Resumindo: repetição constrói preferência, lacuna de curiosidade prende atenção, e preço participa do prazer. Nenhum desses é sobre enganar ninguém — é sobre trabalhar a favor de como o cérebro já funciona.",
+          "CTA::Chega — de uma vida sem graça::E se o que te trava não é falta de gatilho, e sim aparecer com medo, de qualquer jeito — vale olhar pro 'Chega'. O Método V.I.D.A. ajuda a sair do automático e aparecer com mais intenção, sem depender só de força de vontade. Link aqui embaixo.",
+          "FECHAMENTO: Guarda os três: repetição, lacuna de curiosidade, preço como experiência. Testa um essa semana e comenta aqui qual foi.",
+          "THUMB::3 ícones numerados (círculo repetindo / lupa com interrogação / etiqueta de preço) + texto “3 GATILHOS QUE A CIÊNCIA JÁ PROVOU”.",
+        ],
+      },
+      {
+        type: "Estudo",
+        title: "O experimento que mediu, no sangue, o que uma boa história faz no seu cérebro",
+        hook: "Um neurocientista pegou sangue de voluntários antes e depois de assistirem um vídeo de dois minutos — só pra provar, com número, o que uma história bem contada faz no corpo.",
+        ebook: "Acorde Cedo — Método Lucidez",
+        body: [
+          "GANCHO (0:00–0:30): Um neurocientista pegou sangue de voluntários antes e depois de assistirem um vídeo de dois minutos — só pra provar, com número no papel, o que uma história bem contada faz dentro do corpo da pessoa. E o resultado prevê, melhor que qualquer dado demográfico, quem vai agir depois de ouvir aquilo.",
+          "CUT::Corte reel — gancho (0:00–0:30)",
+          "DESENVOLVIMENTO: O neurocientista é Paul Zak, da Claremont Graduate University, conhecido por estudar oxitocina — o hormônio ligado a confiança e conexão social. Em uma série de estudos, ele mostrou a voluntários um vídeo real: um pai contando a rotina de cuidar do filho pequeno em tratamento contra um câncer terminal.",
+          "Antes e depois do vídeo, a equipe coletava sangue pra medir os níveis de oxitocina e cortisol de cada pessoa.",
+          "CUT::Corte reel — a coleta de sangue antes/depois do vídeo (~35s)",
+          "O achado: quanto mais a história tinha tensão emocional real — não drama forçado, tensão de verdade, com risco genuíno — mais oxitocina era liberada. E quanto mais oxitocina, mais dinheiro a pessoa doava depois, de forma voluntária, pra estranhos, num joguinho econômico que a equipe usava como medida de generosidade real.",
+          "A correlação entre oxitocina liberada e generosidade era mais forte do que idade, renda, ou qualquer outro dado que normalmente se usa pra prever comportamento de consumidor.",
+          "CUT::Corte reel — o achado principal em bloco (~40s)",
+          "APLICAÇÃO REAL: Isso muda a ordem de qualquer roteiro. Um vídeo que abre com dado, funcionalidade ou proposta de valor não ativa esse mecanismo. Um vídeo que abre com uma pessoa real, em uma situação real, com tensão genuína — sim.",
+          "Não é sobre inventar um drama que não existe. É sobre contar o que já é verdade, do jeito que a estrutura de história pede: alguém, com um objetivo, enfrentando um obstáculo real.",
+          "CTA::Acorde Cedo — Método Lucidez::E se você sente que tem história pra contar mas nunca tem energia sobrando no fim do dia pra gravar direito, o ponto pode nem ser a história — pode ser o horário. O guia 'Acorde Cedo' ajuda a achar o horário em que seu corpo realmente rende, segundo seu cronotipo. Link aqui embaixo.",
+          "FECHAMENTO: Da próxima vez que for gravar, testa abrir com a cena, não com o dado. Comenta aqui se você sentir diferença na resposta das pessoas.",
+          "THUMB::Frasco de sangue estilizado + rosto emocionado ao fundo + texto “ELES MEDIRAM NO SANGUE O QUE UMA HISTÓRIA FAZ EM VOCÊ”.",
+        ],
+      },
+    ],
+  },
+];
+const EBOOKS = [
+  { title: "Chega — de uma vida sem graça", pitch: "Método V.I.D.A.: 4 passos pra sair do automático e voltar a viver com intenção, com estrutura, não força de vontade." },
+  { title: "Acorde Cedo — Método Lucidez", pitch: "Pare de remar contra sua biologia: ache o horário em que você realmente produz, segundo seu cronotipo." },
+  { title: "Divorciei! E agora?", pitch: "Os primeiros passos pra se reencontrar depois que tudo muda, sem se perder de si." },
+  { title: "A Boa Moça Morreu", pitch: "Ser levada a sério começa onde termina a vontade de agradar todo mundo." },
+];
+// Ordem de uso já consumida nesta semana (3 roteiros = 3 e-books usados). O próximo roteiro gerado usa o índice seguinte.
+const EBOOK_USE_COUNT = 6;
+const LS_KEY = "neuro_dashboard_progress_v1";
+const SUPABASE_URL = "https://jlswxyjceluwzdyalwgi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsc3d4eWpjZWx1d3pkeWFsd2dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4Mjc3MTgsImV4cCI6MjEwMjQwMzcxOH0.CVgM1g-Xo-Lru7WXTES8ezGy1mNpo-YAKCgjZKWNDBw";
+const SYNC_KEY = "tamy"; // chave fixa pessoal — este app é de uso individual
+const supa = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let progressCache = {};
+function loadProgress() { return progressCache; }
+function setSyncStatus(state) {
+  const el = document.getElementById("syncStatus");
+  if (!el) return;
+  if (state === "ok") el.textContent = "☁️ sincronizado entre seus aparelhos";
+  else if (state === "saving") el.textContent = "☁️ salvando...";
+  else if (state === "offline") el.textContent = "⚠️ sem internet — salvo só neste aparelho por enquanto";
+  else el.textContent = "⏳ conectando...";
+}
+async function fetchRemoteProgress() {
+  if (!supa) return null;
+  try {
+    const { data, error } = await supa.from("neuro_progress").select("data").eq("sync_key", SYNC_KEY).maybeSingle();
+    if (error) throw error;
+    return data ? data.data : {};
+  } catch (e) {
+    console.warn("Supabase fetch failed", e);
+    return null;
+  }
+}
+async function pushRemoteProgress(p) {
+  if (!supa) { setSyncStatus("offline"); return; }
+  setSyncStatus("saving");
+  try {
+    const { error } = await supa.from("neuro_progress").upsert({ sync_key: SYNC_KEY, data: p, updated_at: new Date().toISOString() });
+    if (error) throw error;
+    setSyncStatus("ok");
+  } catch (e) {
+    console.warn("Supabase save failed", e);
+    setSyncStatus("offline");
+  }
+}
+function saveProgress(p) {
+  progressCache = p;
+  localStorage.setItem(LS_KEY, JSON.stringify(p));
+  pushRemoteProgress(p);
+}
+async function initProgress() {
+  let local = {};
+  try { local = JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e) { local = {}; }
+  progressCache = local;
+  const remote = await fetchRemoteProgress();
+  if (remote && Object.keys(remote).length) {
+    // remoto existe: mescla (remoto tem prioridade, mas mantém marcações locais que o remoto ainda não tem)
+    progressCache = Object.assign({}, local, remote);
+    localStorage.setItem(LS_KEY, JSON.stringify(progressCache));
+    setSyncStatus("ok");
+  } else if (remote !== null) {
+    // remoto vazio mas alcançável: sobe o que tem local
+    if (Object.keys(local).length) pushRemoteProgress(local);
+    setSyncStatus("ok");
+  } else {
+    setSyncStatus("offline");
+  }
+  render();
+}
+function dayKey(weekNum, idx, sub) { return `w${weekNum}_d${idx}_${sub}`; }
+const SUBTASKS = [
+  "Ler sobre o cientista e o conceito (5 min)",
+  "Entender o experimento a fundo (10 min)",
+  "Escrever 1 aplicação prática de neuromarketing (5 min)",
+];
+function render() {
+  const progress = loadProgress();
+  const week = WEEKS[WEEKS.length - 1];
+  document.getElementById("weekTitle").textContent = `Semana ${week.number}`;
+  document.getElementById("weekDates").textContent = week.dateRange;
+  document.getElementById("themeTitle").textContent = week.theme;
+  document.getElementById("themeDesc").textContent = week.themeDesc;
+  // days
+  const daysEl = document.getElementById("days");
+  daysEl.innerHTML = "";
+  let doneCount = 0;
+  week.days.forEach((d, idx) => {
+    const subDone = SUBTASKS.map((_, si) => !!progress[dayKey(week.number, idx, si)]);
+    const complete = subDone.every(Boolean);
+    if (complete) doneCount++;
+    const repChecked = !!progress[`w${week.number}_d${idx}_rep`];
+    const card = document.createElement("div");
+    card.className = "day-card" + (complete ? " done" : "");
+    card.innerHTML = `
+      <div class="day-head" data-toggle>
+        <div class="day-head-left">
+          <div class="day-badge">${complete ? "✓" : d.date.split(" ")[0]}</div>
+          <div>
+            <div class="day-title">${d.day} · ${d.topic}</div>
+            <div class="day-sci">${d.scientist}</div>
+          </div>
+        </div>
+        <div class="chev">▾</div>
+      </div>
+      <div class="day-body">
+        <div class="quote">“${d.quote}”<small>${d.quoteNote}</small></div>
+        <div class="exp-title">${d.experimentTitle}</div>
+        <div class="exp-text">${d.experimentText}</div>
+        <div class="apply"><b>Aplicação real:</b> ${d.apply}</div>
+        <div class="checklist">
+          ${SUBTASKS.map((t, si) => `
+            <label class="check-item ${subDone[si] ? "checked" : ""}">
+              <input type="checkbox" data-week="${week.number}" data-day="${idx}" data-sub="${si}" ${subDone[si] ? "checked" : ""}>
+              <span>${t}</span>
+            </label>`).join("")}
+        </div>
+        ${d.repertoire ? `
+        <div class="repertoire-box">
+          <div class="rep-head">
+            <span class="repertoire-cat">🔭 Repertório extra · ${d.repertoire.category}</span>
+          </div>
+          <div class="repertoire-title">${d.repertoire.title}</div>
+          <div class="repertoire-text">${d.repertoire.text}</div>
+          <label class="rep-check ${repChecked ? "checked" : ""}">
+            <input type="checkbox" data-rep-week="${week.number}" data-rep-day="${idx}" ${repChecked ? "checked" : ""}>
+            <span>Já vi essa (bônus, ~2 min, não conta pra evolução do estudo científico)</span>
+          </label>
+        </div>` : ""}
+      </div>`;
+    daysEl.appendChild(card);
+  });
+  document.getElementById("statDaysWeek").textContent = `${doneCount}/5`;
+  document.getElementById("weekProgressBar").style.width = `${(doneCount/5)*100}%`;
+  // totals across all weeks
+  let totalDays = 0, totalScripts = 0, completeWeeksStreak = 0;
+  let streakBroken = false;
+  for (let i = WEEKS.length - 1; i >= 0; i--) {
+    const w = WEEKS[i];
+    let wDone = 0;
+    w.days.forEach((d, idx) => {
+      const complete = SUBTASKS.every((_, si) => !!progress[dayKey(w.number, idx, si)]);
+      if (complete) { wDone++; totalDays++; }
+    });
+    if (w.scriptsReady) totalScripts += w.scripts.length;
+    if (!streakBroken && wDone === 5 && w.scriptsReady) completeWeeksStreak++;
+    else if (wDone < 5) streakBroken = true;
+  }
+  document.getElementById("statStreak").textContent = completeWeeksStreak;
+  document.getElementById("statTotalDays").textContent = totalDays;
+  document.getElementById("statScripts").textContent = totalScripts;
+  // friday block
+  const fb = document.getElementById("fridayBlock");
+  if (!week.scriptsReady) {
+    fb.innerHTML = `
+      <div class="friday">
+        <div class="friday-head">
+          <div><b>Roteiros da Semana ${week.number}</b></div>
+          <span class="badge-status badge-wait">Aguardando sexta</span>
+        </div>
+        <p style="font-size:13px;color:var(--sub);margin-top:8px;">Assim que os 5 dias de estudo forem concluídos, os 3 roteiros de 10 minutos aparecem aqui automaticamente na sexta-feira.</p>
+      </div>`;
+  } else {
+    fb.innerHTML = `
+      <div class="friday">
+        <div class="friday-head">
+          <div><b>Roteiros da Semana ${week.number}</b> — gravar sábado</div>
+          <span class="badge-status badge-ready">Prontos</span>
+        </div>
+        <div id="scriptCards"></div>
+      </div>`;
+    const sc = fb.querySelector("#scriptCards");
+    week.scripts.forEach((s, si) => {
+      const card = document.createElement("div");
+      card.className = "script-card";
+      const bodyHtml = s.body.map(line => {
+        if (line.startsWith("CUT::")) return `<div class="cut">✂ ${line.replace("CUT::","")}</div>`;
+        if (line.startsWith("CTA::")) {
+          const [, title, text] = line.split("::");
+          return `<div class="cta-box"><b>📗 Indicação de e-book — ${title}</b><br>${text}</div>`;
+        }
+        if (line.startsWith("THUMB::")) return `<div class="thumb-box"><b>🖼 Thumbnail sugerida:</b> ${line.replace("THUMB::","")}</div>`;
+        return `<p style="margin:8px 0;">${line}</p>`;
+      }).join("");
+      card.innerHTML = `
+        <div class="script-top" data-toggle>
+          <div>
+            <span class="script-type">${s.type}</span>
+            <div class="script-title">${s.title}</div>
+            <div class="script-hook">${s.hook}</div>
+          </div>
+          <div class="chev">▾</div>
+        </div>
+        <div class="script-body">${bodyHtml}</div>`;
+      sc.appendChild(card);
+    });
+  }
+  // ebooks
+  const eg = document.getElementById("ebookGrid");
+  eg.innerHTML = "";
+  const nextIdx = EBOOK_USE_COUNT % EBOOKS.length;
+  EBOOKS.forEach((e, i) => {
+    const div = document.createElement("div");
+    div.className = "ebook-card" + (i === nextIdx ? " next" : "");
+    div.innerHTML = `${i === nextIdx ? '<div class="ebook-tag">Próximo CTA</div>' : ""}<div class="ebook-title">${e.title}</div><div class="ebook-pitch">${e.pitch}</div>`;
+    eg.appendChild(div);
+  });
+  // history
+  const hb = document.getElementById("historyBody");
+  hb.innerHTML = "";
+  WEEKS.slice().reverse().forEach(w => {
+    let wDone = 0;
+    w.days.forEach((d, idx) => { if (SUBTASKS.every((_, si) => !!progress[dayKey(w.number, idx, si)])) wDone++; });
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>Semana ${w.number}</td>
+      <td>${w.theme}</td>
+      <td><span class="pill ${wDone===5?"pill-ok":"pill-mid"}">${wDone}/5 dias</span></td>
+      <td><span class="pill ${w.scriptsReady?"pill-ok":"pill-mid"}">${w.scriptsReady ? w.scripts.length+" gerados" : "pendente"}</span></td>`;
+    hb.appendChild(tr);
+  });
+  // toggles
+  document.querySelectorAll("[data-toggle]").forEach(el => {
+    el.addEventListener("click", () => el.closest(".day-card, .script-card").classList.toggle("open"));
+  });
+  document.querySelectorAll(".checklist input").forEach(inp => {
+    inp.addEventListener("click", (e) => e.stopPropagation());
+    inp.addEventListener("change", () => {
+      const p = loadProgress();
+      const k = dayKey(inp.dataset.week, inp.dataset.day, inp.dataset.sub);
+      p[k] = inp.checked;
+      saveProgress(p);
+      render();
+    });
+  });
+  document.querySelectorAll(".rep-check input").forEach(inp => {
+    inp.addEventListener("click", (e) => e.stopPropagation());
+    inp.addEventListener("change", () => {
+      const p = loadProgress();
+      p[`w${inp.dataset.repWeek}_d${inp.dataset.repDay}_rep`] = inp.checked;
+      saveProgress(p);
+      render();
+    });
+  });
+}
+document.getElementById("refreshBtn").addEventListener("click", async () => {
+  setSyncStatus("connecting");
+  const remote = await fetchRemoteProgress();
+  if (remote !== null) {
+    progressCache = remote;
+    localStorage.setItem(LS_KEY, JSON.stringify(progressCache));
+    setSyncStatus("ok");
+    render();
+  } else {
+    setSyncStatus("offline");
+  }
+});
+initProgress();
+</script>
+</body>
+</html>
