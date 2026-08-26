@@ -90,6 +90,11 @@
   table.history { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
   table.history th { text-align: left; color: var(--sub); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
   table.history td { padding: 10px 8px; border-bottom: 1px solid var(--line); }
+  table.history tbody tr { cursor: pointer; transition: background .15s; }
+  table.history tbody tr:hover { background: var(--cream); }
+  table.history tbody tr.viewing { background: var(--cream); }
+  #historyBanner { background: var(--cream); border: 1px solid var(--gold); border-radius: 999px; padding: 6px 14px; display: inline-block; }
+  #historyBanner a { color: var(--orange); cursor: pointer; text-decoration: underline; font-weight: 700; }
   .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
   .pill-ok { background: #E4F0E5; color: var(--green); }
   .pill-mid { background: #FBEFD9; color: var(--orange); }
@@ -110,6 +115,7 @@
     <div class="eyebrow">Sistema de Conteúdo · Neurociência &amp; Neuromarketing</div>
     <h1 id="weekTitle">Semana 1</h1>
     <div class="sub" id="weekDates"></div>
+    <div id="historyBanner" style="display:none;margin-top:8px;font-size:12px;"></div>
     <div class="sub" id="syncStatus" style="margin-top:6px;font-size:11px;">⏳ conectando...</div>
     <button class="reset" id="refreshBtn" style="margin-top:8px;">🔄 Atualizar de outro aparelho</button>
   </header>
@@ -132,6 +138,7 @@
   <h3 class="section">Seus e-books · rotação de CTA</h3>
   <div class="ebook-grid" id="ebookGrid"></div>
   <h3 class="section">Evolução</h3>
+  <div class="sub" style="margin:-8px 0 10px;font-size:12px;">Clique em uma semana pra ver o conteúdo completo dela.</div>
   <table class="history">
     <thead><tr><th>Semana</th><th>Tema</th><th>Estudo</th><th>Roteiros</th></tr></thead>
     <tbody id="historyBody"></tbody>
@@ -463,6 +470,7 @@ const EBOOKS = [
 ];
 // Ordem de uso já consumida nesta semana (3 roteiros = 3 e-books usados). O próximo roteiro gerado usa o índice seguinte.
 const EBOOK_USE_COUNT = 6;
+let viewedWeekIndex = WEEKS.length - 1; // semana sendo exibida no momento (clique no histórico troca isso)
 const LS_KEY = "neuro_dashboard_progress_v1";
 const SUPABASE_URL = "https://jlswxyjceluwzdyalwgi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsc3d4eWpjZWx1d3pkeWFsd2dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4Mjc3MTgsImV4cCI6MjEwMjQwMzcxOH0.CVgM1g-Xo-Lru7WXTES8ezGy1mNpo-YAKCgjZKWNDBw";
@@ -533,11 +541,23 @@ const SUBTASKS = [
 ];
 function render() {
   const progress = loadProgress();
-  const week = WEEKS[WEEKS.length - 1];
+  const week = WEEKS[viewedWeekIndex];
   document.getElementById("weekTitle").textContent = `Semana ${week.number}`;
   document.getElementById("weekDates").textContent = week.dateRange;
   document.getElementById("themeTitle").textContent = week.theme;
   document.getElementById("themeDesc").textContent = week.themeDesc;
+  const historyBanner = document.getElementById("historyBanner");
+  if (viewedWeekIndex === WEEKS.length - 1) {
+    historyBanner.style.display = "none";
+  } else {
+    historyBanner.style.display = "inline-block";
+    historyBanner.innerHTML = `📖 Vendo o histórico da Semana ${week.number} — <a id="backToCurrentBtn">voltar para a semana atual</a>`;
+    document.getElementById("backToCurrentBtn").addEventListener("click", () => {
+      viewedWeekIndex = WEEKS.length - 1;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
   // days
   const daysEl = document.getElementById("days");
   daysEl.innerHTML = "";
@@ -665,16 +685,25 @@ function render() {
   // history
   const hb = document.getElementById("historyBody");
   hb.innerHTML = "";
-  WEEKS.slice().reverse().forEach(w => {
+  WEEKS.map((w, i) => ({ w, i })).reverse().forEach(({ w, i }) => {
     let wDone = 0;
     w.days.forEach((d, idx) => { if (SUBTASKS.every((_, si) => !!progress[dayKey(w.number, idx, si)])) wDone++; });
     const tr = document.createElement("tr");
+    tr.dataset.idx = i;
+    if (i === viewedWeekIndex) tr.classList.add("viewing");
     tr.innerHTML = `
-      <td>Semana ${w.number}</td>
+      <td>Semana ${w.number}${i === viewedWeekIndex ? " 👁" : ""}</td>
       <td>${w.theme}</td>
       <td><span class="pill ${wDone===5?"pill-ok":"pill-mid"}">${wDone}/5 dias</span></td>
       <td><span class="pill ${w.scriptsReady?"pill-ok":"pill-mid"}">${w.scriptsReady ? w.scripts.length+" gerados" : "pendente"}</span></td>`;
     hb.appendChild(tr);
+  });
+  hb.querySelectorAll("tr[data-idx]").forEach(tr => {
+    tr.addEventListener("click", () => {
+      viewedWeekIndex = parseInt(tr.dataset.idx, 10);
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   });
   // toggles
   document.querySelectorAll("[data-toggle]").forEach(el => {
