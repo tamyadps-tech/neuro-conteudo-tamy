@@ -492,6 +492,7 @@ const EBOOKS = [
 // Ordem de uso já consumida nesta semana (3 roteiros = 3 e-books usados). O próximo roteiro gerado usa o índice seguinte.
 const EBOOK_USE_COUNT = 6;
 let viewedWeekIndex = WEEKS.length - 1; // semana sendo exibida no momento (clique no histórico troca isso)
+let openDayKeys = new Set(); // dias com o card aberto no momento (persiste entre re-renders; só fecha quando o dia é 100% concluído)
 const LS_KEY = "neuro_dashboard_progress_v1";
 const SUPABASE_URL = "https://jlswxyjceluwzdyalwgi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsc3d4eWpjZWx1d3pkeWFsd2dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4Mjc3MTgsImV4cCI6MjEwMjQwMzcxOH0.CVgM1g-Xo-Lru7WXTES8ezGy1mNpo-YAKCgjZKWNDBw";
@@ -588,8 +589,10 @@ function render() {
     const complete = subDone.every(Boolean);
     if (complete) doneCount++;
     const repChecked = !!progress[`w${week.number}_d${idx}_rep`];
+    const cardKey = `${week.number}_${idx}`;
     const card = document.createElement("div");
-    card.className = "day-card" + (complete ? " done" : "");
+    card.dataset.cardKey = cardKey;
+    card.className = "day-card" + (complete ? " done" : "") + (openDayKeys.has(cardKey) ? " open" : "");
     card.innerHTML = `
       <div class="day-head" data-toggle>
         <div class="day-head-left">
@@ -732,8 +735,17 @@ function render() {
     });
   });
   // toggles
-  document.querySelectorAll("[data-toggle]").forEach(el => {
-    el.addEventListener("click", () => el.closest(".day-card, .script-card").classList.toggle("open"));
+  document.querySelectorAll(".day-head[data-toggle]").forEach(el => {
+    el.addEventListener("click", () => {
+      const card = el.closest(".day-card");
+      card.classList.toggle("open");
+      const key = card.dataset.cardKey;
+      if (card.classList.contains("open")) openDayKeys.add(key);
+      else openDayKeys.delete(key);
+    });
+  });
+  document.querySelectorAll(".script-top[data-toggle]").forEach(el => {
+    el.addEventListener("click", () => el.closest(".script-card").classList.toggle("open"));
   });
   document.querySelectorAll(".checklist input").forEach(inp => {
     inp.addEventListener("click", (e) => e.stopPropagation());
@@ -742,6 +754,11 @@ function render() {
       const k = dayKey(inp.dataset.week, inp.dataset.day, inp.dataset.sub);
       p[k] = inp.checked;
       saveProgress(p);
+      // mantém o card aberto enquanto o dia não estiver 100% concluído; só fecha quando finalizar
+      const cardKey = `${inp.dataset.week}_${inp.dataset.day}`;
+      const allDone = SUBTASKS.every((_, si) => !!p[dayKey(inp.dataset.week, inp.dataset.day, si)]);
+      if (allDone) openDayKeys.delete(cardKey);
+      else openDayKeys.add(cardKey);
       render();
     });
   });
@@ -751,6 +768,9 @@ function render() {
       const p = loadProgress();
       p[`w${inp.dataset.repWeek}_d${inp.dataset.repDay}_rep`] = inp.checked;
       saveProgress(p);
+      const cardKey = `${inp.dataset.repWeek}_${inp.dataset.repDay}`;
+      const allDone = SUBTASKS.every((_, si) => !!p[dayKey(inp.dataset.repWeek, inp.dataset.repDay, si)]);
+      if (!allDone) openDayKeys.add(cardKey);
       render();
     });
   });
