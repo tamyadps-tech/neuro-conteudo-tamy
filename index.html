@@ -57,6 +57,7 @@
   .quote small { display: block; font-style: normal; color: var(--sub); margin-top: 4px; }
   .exp-title { font-weight: 700; font-size: 13px; margin-top: 12px; }
   .exp-text { font-size: 13.5px; color: #4A4038; line-height: 1.5; }
+  .mini-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--green); margin-top: 12px; margin-bottom: 4px; }
   .apply { font-size: 13.5px; color: #4A4038; line-height: 1.5; margin-top: 10px; background: #FBF8F2; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); }
   .apply b { color: var(--orange); }
   .checklist { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
@@ -164,8 +165,10 @@ const WEEKS = [
         topic: "A hipótese do marcador somático",
         quote: "Somos, antes de tudo, máquinas de sentir que pensam — não máquinas de pensar que sentem.",
         quoteNote: "ideia central de Damásio, resumida em suas próprias entrevistas e em “O Erro de Descartes” (1994)",
+        scientistBio: "Antônio Damásio é neurocientista português radicado nos EUA, professor na University of Southern California e diretor do Brain and Creativity Institute. Formado em medicina em Lisboa, construiu a carreira estudando pacientes com lesões cerebrais localizadas para entender como emoção e razão se conectam — é um dos neurocientistas mais citados do mundo e autor de “O Erro de Descartes” (1994), “O Mistério da Consciência” e “A Estranha Ordem das Coisas” (2018).",
         experimentTitle: "O caso Elliot e o Iowa Gambling Task (Bechara & Damásio, 1994)",
-        experimentText: "Elliot perdeu parte do córtex pré-frontal ventromedial numa cirurgia. QI, memória e lógica intactos — mas ele não conseguia mais decidir nada sozinho. No Iowa Gambling Task, pessoas saudáveis desenvolvem uma resposta corporal (medida por resposta galvânica da pele) que as afasta dos baralhos ruins antes mesmo de saberem conscientemente por quê. Pacientes com dano na VMPFC nunca desenvolvem esse alerta — e continuam escolhendo mal, mesmo sabendo racionalmente que é ruim.",
+        method: "Junto com Antoine Bechara e Steven W. Anderson, na University of Iowa, Damásio criou um teste controlado: o participante escolhe cartas de 4 baralhos (A, B, C, D) virados pra baixo, sem saber as regras. Dois baralhos dão prêmios altos, mas perdas piores no longo prazo; dois dão prêmios menores, mas resultam em saldo positivo. Enquanto a pessoa joga, eletrodos na pele medem a resposta galvânica (SCR) — um sinal físico de ativação emocional, captado independente do que a pessoa diz conscientemente estar pensando.",
+        experimentText: "Elliot perdeu parte do córtex pré-frontal ventromedial numa cirurgia. QI, memória e lógica intactos — mas ele não conseguia mais decidir nada sozinho. No Iowa Gambling Task, pessoas saudáveis desenvolvem a resposta galvânica que as afasta dos baralhos ruins antes mesmo de saberem conscientemente por quê. Pacientes com dano na VMPFC, como Elliot, nunca desenvolvem esse alerta — e continuam escolhendo mal, repetidamente, mesmo sabendo racionalmente que é ruim.",
         apply: "Sem ativar uma sensação no corpo (alívio, aperto, orgulho), um argumento 100% lógico não fecha decisão nenhuma — só justifica depois.",
         repertoire: {
           category: "Astronomia",
@@ -179,8 +182,10 @@ const WEEKS = [
         topic: "Sistema 1 (rápido/emocional) vs. Sistema 2 (lento/racional)",
         quote: "Nada na vida é tão importante quanto você pensa que é, enquanto você está pensando nisso.",
         quoteNote: "citação real de Kahneman, “Rápido e Devagar” (2011)",
+        scientistBio: "Daniel Kahneman (1934–2024) foi psicólogo israelense-americano, professor emérito em Princeton, e ganhou o Prêmio Nobel de Economia em 2002 — apesar de nunca ter sido economista — pelo trabalho que fez ao lado do psicólogo Amos Tversky (falecido em 1996, antes do Nobel) sobre como as pessoas realmente decidem sob incerteza. Essa parceria fundou o que hoje se chama economia comportamental, e Kahneman resumiu décadas de pesquisa no best-seller “Rápido e Devagar” (2011).",
         experimentTitle: "O experimento da roleta — efeito de ancoragem (Tversky & Kahneman, 1974)",
-        experimentText: "Uma roleta manipulada parava só em 10 ou 65. Ao perguntar quantos países africanos fazem parte da ONU, quem via 65 chutava valores bem mais altos que quem via 10 — mesmo sabendo que a roleta não tinha relação nenhuma com a pergunta. O Sistema 1 usa a primeira referência disponível, mesmo irrelevante.",
+        method: "Publicado na revista Science (\"Judgment under Uncertainty: Heuristics and Biases\"), o experimento usava uma roleta numerada de 0 a 100, mas manipulada por trás de cena para parar sempre em 10 ou em 65. Cada participante via a roleta parar, e então respondia duas perguntas em sequência: primeiro, se o percentual de países africanos na ONU era maior ou menor que o número da roleta; depois, qual seria sua estimativa real desse percentual — mesmo sabendo que a roleta era só um sorteio aleatório sem nenhuma relação com a pergunta.",
+        experimentText: "Uma roleta manipulada parava só em 10 ou 65. Ao perguntar quantos países africanos fazem parte da ONU, quem via 65 chutava valores bem mais altos que quem via 10 — mesmo sabendo que a roleta não tinha relação nenhuma com a pergunta. O Sistema 1 usa a primeira referência disponível, mesmo irrelevante, como âncora pra qualquer estimativa seguinte.",
         apply: "É por isso que 'de R$497 por R$197' ancora a percepção de valor antes da pessoa avaliar racionalmente se vale R$197.",
         repertoire: {
           category: "História",
@@ -194,8 +199,10 @@ const WEEKS = [
         topic: "95% da decisão acontece fora da consciência",
         quote: "A maior parte do pensamento, emoção e aprendizado acontece sem que a pessoa tenha consciência disso.",
         quoteNote: "estimativa central de Zaltman em “How Customers Think” (2003), Harvard",
+        scientistBio: "Gerald Zaltman é professor emérito de marketing na Harvard Business School, com formação também em antropologia — o que explica seu interesse em como significado e emoção se constroem antes da linguagem consciente. Fundou a empresa de pesquisa Olson Zaltman Associates e registrou a patente da técnica ZMET nos anos 1990, hoje usada por grandes marcas pra entender motivação de compra além do que o consumidor consegue dizer em uma pesquisa comum.",
         experimentTitle: "ZMET — Zaltman Metaphor Elicitation Technique",
-        experimentText: "Zaltman desenvolveu uma técnica que usa metáforas e imagens (não perguntas diretas) para acessar motivações de compra que o próprio consumidor não sabe verbalizar. Pesquisa de opinião direta (“o que você prefere?”) sistematicamente erra porque o consumidor não tem acesso consciente ao próprio motivo.",
+        method: "No ZMET, o participante recebe uma semana pra reunir de 10 a 12 imagens (de revistas, fotos próprias, qualquer fonte) que representem seus sentimentos sobre um tema — nunca opiniões diretas. Depois, participa de uma entrevista individual de cerca de 2 horas, onde o pesquisador usa técnicas como contar histórias sobre cada imagem, associar sensações (cheiro, textura, som) a elas e construir uma \"escultura mental\" — um mapa visual das conexões emocionais que o próprio entrevistado desenha e valida ao final.",
+        experimentText: "Zaltman desenvolveu essa técnica porque pesquisa de opinião direta (“o que você prefere?”) sistematicamente erra: o consumidor não tem acesso consciente ao próprio motivo de compra. As entrevistas ZMET revelam com frequência que a razão real por trás de uma escolha de compra é completamente diferente da razão que a pessoa diria se apenas fosse perguntada diretamente.",
         apply: "Perguntar diretamente ao público 'o que você quer ver' é o pior jeito de descobrir o que realmente vai prender atenção.",
         repertoire: {
           category: "Notícia · Astronomia",
@@ -209,8 +216,10 @@ const WEEKS = [
         topic: "Prova social específica vence prova social genérica",
         quote: "Vemos um comportamento como mais correto quando o observamos em outros — especialmente em pessoas parecidas conosco.",
         quoteNote: "princípio central de Cialdini em “As Armas da Persuasão”",
+        scientistBio: "Robert Cialdini é professor emérito de psicologia e marketing na Arizona State University. Antes de escrever sua obra mais famosa, passou cerca de 3 anos infiltrado — como vendedor, estagiário ou voluntário — em programas de treinamento de vendas, marketing porta-a-porta e captação de doações, observando de dentro quais táticas realmente funcionavam. Só depois formalizou os princípios em “As Armas da Persuasão” (1984), hoje um dos livros mais citados sobre influência e comportamento do consumidor.",
         experimentTitle: "O estudo das toalhas de hotel (Goldstein, Cialdini & Griskevicius, 2008)",
-        experimentText: "Placas com “75% dos hóspedes DESTE QUARTO reutilizaram a toalha” geraram significativamente mais reuso do que o apelo ambiental genérico. Quanto mais específica e parecida com o contexto do observador, mais forte a norma social.",
+        method: "Publicado na Journal of Consumer Research, foi um experimento de campo real, não um laboratório: em vários hotéis, cartões nos banheiros pediam a reutilização de toalhas, mudando só a mensagem entre os quartos. Um grupo via um apelo ambiental genérico (“ajude a proteger o meio ambiente”); outro via uma norma social específica (“75% dos hóspedes DESTE QUARTO reutilizaram a toalha durante a estadia”). Os pesquisadores mediram o comportamento real de reuso de toalha — não uma resposta de pesquisa — ao longo de várias noites, em centenas de quartos.",
+        experimentText: "Placas com “75% dos hóspedes DESTE QUARTO reutilizaram a toalha” geraram significativamente mais reuso do que o apelo ambiental genérico. Quanto mais específica e parecida com o contexto do observador for a norma social — “gente como eu, aqui mesmo” —, mais forte é o efeito sobre o comportamento real, não só a intenção declarada.",
         apply: "'Alunos satisfeitos' é fraco. 'A Marina, que também travava pra gravar, gravou o primeiro vídeo em 3 dias' é forte — porque é específico e parecido com quem assiste.",
         repertoire: {
           category: "Ciência",
@@ -224,8 +233,10 @@ const WEEKS = [
         topic: "A via rápida da amígdala",
         quote: "As conexões dos sistemas emocionais para os sistemas cognitivos são mais fortes do que as conexões dos sistemas cognitivos para os emocionais.",
         quoteNote: "ideia central de LeDoux em “The Emotional Brain” (1996)",
+        scientistBio: "Joseph LeDoux é neurocientista americano, professor no Center for Neural Science da New York University (NYU). A partir dos anos 1980, dedicou a carreira a mapear fisicamente os circuitos neurais do medo — não apenas descrevê-lo psicologicamente — e é autor de “The Emotional Brain” (1996), um dos livros que estabeleceu a amígdala como peça central no processamento emocional.",
         experimentTitle: "Duas vias até a amígdala",
-        experimentText: "Um estímulo de ameaça pode chegar à amígdala por uma via lenta (tálamo → córtex → amígdala, que analisa e pondera) ou por uma via rápida (tálamo → amígdala direto, sem passar pelo córtex). A via rápida existe por sobrevivência — reagir mais rápido pode significar viver. Ela dispara antes da parte racional processar conscientemente.",
+        method: "LeDoux e sua equipe usaram principalmente modelos animais (ratos), com técnicas de rastreamento neural e lesão cirúrgica seletiva. O procedimento clássico é o condicionamento ao medo: um som neutro é repetidamente associado a um leve choque na pata; depois de algumas repetições, o rato passa a “congelar” (parar de se mover) só de ouvir o som, mesmo sem o choque. Ao lesionar cirurgicamente diferentes regiões do cérebro do animal e observar se o congelamento ainda ocorria, LeDoux conseguiu mapear duas rotas físicas distintas até a amígdala.",
+        experimentText: "Um estímulo de ameaça pode chegar à amígdala por uma via lenta (tálamo → córtex → amígdala, que analisa e pondera) ou por uma via rápida (tálamo → amígdala direto, sem passar pelo córtex). A via rápida existe por sobrevivência — reagir mais rápido pode significar viver. Ela dispara antes da parte racional processar conscientemente o estímulo.",
         apply: "Urgência real (vaga que realmente acaba) ativa decisão antes da pessoa 'pensar demais e desistir'. Urgência falsa funciona uma vez só — depois quebra a confiança.",
         repertoire: {
           category: "Astronomia",
@@ -318,8 +329,10 @@ const WEEKS = [
         topic: "Histórias com tensão emocional liberam oxitocina — e isso muda o comportamento",
         quote: "Histórias com começo, tensão real e resolução fazem o cérebro liberar oxitocina — e isso muda o quanto a pessoa confia e o quanto ela doa depois.",
         quoteNote: "ideia central de Paul Zak, resumida de sua pesquisa sobre oxitocina e narrativa (Harvard Business Review, 2014, “Why Your Brain Loves Good Storytelling”)",
+        scientistBio: "Paul Zak é neuroeconomista americano, diretor fundador do Center for Neuroeconomics Studies na Claremont Graduate University. Ficou conhecido como “Dr. Love” por ter sido um dos primeiros a medir oxitocina em laboratório para estudar confiança e comportamento econômico real (não só atitude declarada). É autor de “The Moral Molecule” (2012) e “Trust Factor” (2017).",
         experimentTitle: "O vídeo do pai e o filho com câncer (Zak, 2013–2015)",
-        experimentText: "Zak e sua equipe mostraram a voluntários um vídeo real de dois minutos: um pai contando a rotina de cuidar do filho de 2 anos em tratamento contra um câncer terminal. Antes e depois do vídeo, colheram sangue para medir oxitocina e cortisol. Quanto mais oxitocina liberada durante a história, mais dinheiro a pessoa doava depois, de forma voluntária, para estranhos em um jogo econômico — e essa correlação era mais forte que qualquer dado demográfico coletado.",
+        method: "O protocolo de Zak envolve coleta de sangue por agulha intravenosa (via catéter, pra não precisar picar duas vezes) imediatamente antes e imediatamente depois de a pessoa assistir a um vídeo narrativo. O sangue é processado em laboratório pra medir os níveis de oxitocina e cortisol. Depois, cada participante joga um jogo econômico real (tipo jogo da confiança ou do ditador), onde decide, com dinheiro de verdade, quanto doa a um estranho — permitindo comparar o nível hormonal medido com uma ação concreta, não uma resposta de pesquisa.",
+        experimentText: "Zak e sua equipe mostraram a voluntários um vídeo real de dois minutos: um pai contando a rotina de cuidar do filho de 2 anos em tratamento contra um câncer terminal. Quanto mais oxitocina liberada durante a história, mais dinheiro a pessoa doava depois, de forma voluntária, para estranhos no jogo econômico — e essa correlação era mais forte que qualquer dado demográfico coletado.",
         apply: "Um vídeo que abre com dado ou funcionalidade não libera esse composto. Um vídeo que abre com uma pessoa real, em tensão real, sim — é por isso que a história vem antes do dado, sempre.",
         repertoire: {
           category: "Ciência",
@@ -333,8 +346,10 @@ const WEEKS = [
         topic: "O efeito de mera exposição — familiaridade vira preferência, mesmo sem reconhecimento consciente",
         quote: "A repetição de um estímulo, por si só, já é suficiente para aumentar a atitude positiva da pessoa em relação a ele.",
         quoteNote: "conclusão central de Zajonc em “Attitudinal Effects of Mere Exposure”, Journal of Personality and Social Psychology (1968)",
+        scientistBio: "Robert Zajonc (1923–2008) foi psicólogo social polonês-americano, professor na University of Michigan e depois em Stanford. Defendeu, contra a visão dominante da época, que a preferência afetiva pode surgir independentemente — e até antes — de qualquer processamento cognitivo consciente, resumido em seu artigo influente “Preferences need no inferences” (1980, American Psychologist).",
         experimentTitle: "Caracteres chineses e palavras sem sentido (Zajonc, 1968)",
-        experimentText: "Zajonc mostrou a participantes que não liam chinês uma série de ideogramas e palavras inventadas — cada estímulo aparecendo de 1 a 25 vezes, em ordem aleatória. Depois, pediu para avaliarem o quanto gostavam de cada símbolo. Resultado: quanto mais vezes um símbolo tinha aparecido, mais ele era avaliado como agradável — mesmo os participantes não conseguindo dizer conscientemente quais tinham visto mais.",
+        method: "Zajonc apresentou a participantes que não liam chinês uma série de ideogramas reais e palavras inventadas, cada estímulo exibido de 1 a 25 vezes em ordem aleatória, sempre por frações de segundo — rápido demais pra fixação consciente da frequência. Depois da sessão de exposição, pediu que avaliassem o quanto gostavam de cada símbolo, numa escala, e testou separadamente se os participantes conseguiam lembrar quais símbolos tinham visto mais vezes.",
+        experimentText: "Resultado: quanto mais vezes um símbolo tinha aparecido, mais ele era avaliado como agradável — mesmo os participantes não conseguindo dizer conscientemente quais símbolos tinham visto mais. A preferência aumentava com a repetição, de forma independente do reconhecimento consciente da própria repetição.",
         apply: "É por isso que aparecer toda semana, mesmo sem 'viralizar', constrói preferência de marca de um jeito que um único vídeo perfeito nunca constrói sozinho.",
         repertoire: {
           category: "História",
@@ -348,8 +363,10 @@ const WEEKS = [
         topic: "A memória não é gravação — é reconstrução, e pode ser editada por uma palavra",
         quote: "A memória funciona um pouco como uma página da Wikipédia: você pode editá-la, e outras pessoas também podem.",
         quoteNote: "metáfora usada por Loftus em entrevistas e palestras (incluindo seu TED Talk de 2013) para descrever seus achados sobre memória reconstrutiva",
+        scientistBio: "Elizabeth Loftus é psicóloga cognitiva americana, professora na University of California, Irvine, e uma das maiores autoridades do mundo em maleabilidade da memória e falsas memórias. Já atuou como consultora e testemunha especialista em centenas de processos criminais de alto perfil, questionando a confiabilidade de depoimentos de testemunhas oculares, e cunhou o conceito de “efeito da desinformação” (misinformation effect).",
         experimentTitle: "O estudo do acidente de carro (Loftus & Palmer, 1974)",
-        experimentText: "Participantes assistiram ao mesmo vídeo de uma colisão de carros. Depois, foram perguntados sobre a velocidade dos carros — mas o verbo usado na pergunta mudava entre grupos: 'esbarraram', 'bateram', 'colidiram', 'se estraçalharam'. Quem ouviu 'estraçalharam' estimou velocidades bem mais altas — e, uma semana depois, teve mais chance de 'lembrar' de vidro quebrado na cena, que simplesmente não existia no vídeo original.",
+        method: "Participantes assistiram ao mesmo vídeo de uma colisão de carros. Logo depois, respondiam perguntas sobre o que viram — mas o verbo usado na pergunta sobre velocidade mudava entre grupos: 'esbarraram', 'bateram', 'colidiram' ou 'se estraçalharam'. Uma semana depois, sem rever o vídeo, os participantes voltavam para uma segunda rodada de perguntas, incluindo uma pergunta armadilha: “você viu vidro quebrado na cena?” — não havia vidro quebrado nenhum no vídeo original.",
+        experimentText: "Quem ouviu 'estraçalharam' na primeira pergunta estimou velocidades bem mais altas do que quem ouviu 'esbarraram' — e, uma semana depois, teve muito mais chance de 'lembrar' de vidro quebrado na cena, um detalhe que simplesmente não existia no vídeo original. A palavra usada na pergunta tinha, literalmente, editado a lembrança da pessoa.",
         apply: "A palavra que você usa pra descrever a dor ou o problema do seu público não só comunica — ela literalmente participa da reconstrução da lembrança que a pessoa tem da própria experiência.",
         repertoire: {
           category: "Astronomia",
@@ -363,8 +380,10 @@ const WEEKS = [
         topic: "A curiosidade nasce de um vazio entre o que você sabe e o que quer saber",
         quote: "A curiosidade acontece quando a atenção se fixa em uma lacuna no próprio conhecimento — essa lacuna gera uma sensação de privação que a pessoa quer resolver.",
         quoteNote: "síntese da teoria de Loewenstein em “The Psychology of Curiosity: A Review and Reinterpretation”, Psychological Bulletin (1994)",
+        scientistBio: "George Loewenstein é economista comportamental, professor na Carnegie Mellon University e uma das figuras fundadoras da economia comportamental moderna, ao lado de Kahneman e Richard Thaler. É conhecido também por pesquisas sobre escolha intertemporal (por que preferimos recompensas menores agora a maiores depois) e por ter formalizado a teoria do gap de curiosidade em 1994.",
         experimentTitle: "A teoria do information gap",
-        experimentText: "Loewenstein revisou décadas de estudos sobre curiosidade e propôs que ela não depende do quanto você já sabe — depende do tamanho da lacuna percebida entre o que sabe e o que quer saber. Uma lacuna pequena demais não gera curiosidade (parece óbvio); uma lacuna grande demais também não (parece impossível de fechar, e a pessoa desiste). O ponto ideal é uma pergunta específica, que pareça alcançável de responder.",
+        method: "Diferente de um experimento novo isolado, o trabalho de 1994 de Loewenstein na Psychological Bulletin é uma revisão teórica: ele analisou dezenas de estudos empíricos anteriores sobre curiosidade, publicados ao longo de décadas, e usou essa síntese pra propor um modelo unificado — a teoria do information gap — contrastando-a com as teorias de \"drive\" (impulso) que dominavam até então. O modelo gerou previsões testáveis que experimentos posteriores confirmaram.",
+        experimentText: "Loewenstein propôs que a curiosidade não depende do quanto você já sabe — depende do tamanho da lacuna percebida entre o que sabe e o que quer saber. Uma lacuna pequena demais não gera curiosidade (parece óbvio); uma lacuna grande demais também não (parece impossível de fechar, e a pessoa desiste). O ponto ideal é uma pergunta específica, que pareça alcançável de responder.",
         apply: "'Vou te contar um estudo de neurociência' não abre lacuna nenhuma. 'Por que seu cérebro finge lembrar coisas que nunca aconteceram?' abre uma lacuna exata — e é isso que segura a pessoa até o final do vídeo.",
         repertoire: {
           category: "Ciência",
@@ -378,8 +397,10 @@ const WEEKS = [
         topic: "O preço muda o prazer real que o cérebro sente — não é só percepção, é experiência",
         quote: "Ações de marketing, como o preço, podem modular a própria experiência neural de prazer — não apenas o julgamento posterior sobre o produto.",
         quoteNote: "conclusão central de Plassmann, O'Doherty, Rangel & Shiv, “Marketing Actions Can Modulate Neural Representations of Experienced Pleasantness”, PNAS (2008)",
+        scientistBio: "Hilke Plassmann é professora de marketing no INSEAD e uma das pioneiras em aplicar neuroimagem (fMRI) ao estudo de decisão do consumidor — uma das fundadoras do que hoje se chama neurociência do consumidor. Baba Shiv é professor de marketing na Stanford Graduate School of Business, conhecido por pesquisas na fronteira entre neurociência e efeitos tipo placebo no comportamento de compra.",
         experimentTitle: "O vinho de R$10 e o de R$90 que eram o mesmo vinho",
-        experimentText: "Voluntários provaram vinhos enquanto tinham o cérebro escaneado por ressonância magnética funcional. Disseram a eles que estavam bebendo vinhos de preços diferentes — mas era exatamente o mesmo vinho nas duas vezes. Quando achavam que estavam bebendo o vinho mais caro, relatavam mais prazer E o córtex orbitofrontal medial (ligado à experiência real de prazer, não só ao julgamento racional) mostrava mais atividade. O preço não mudou só a opinião — mudou a experiência sensorial registrada no cérebro.",
+        method: "Publicado na PNAS, o estudo colocou voluntários dentro de um aparelho de ressonância magnética funcional (fMRI) enquanto provavam pequenas amostras de vinho através de um tubo. Antes de cada amostra, uma tela informava um preço — mas as amostras eram, sem o conhecimento dos participantes, exatamente o mesmo vinho servido duas vezes, apenas anunciado com preços diferentes. Os pesquisadores mediram tanto a nota de prazer que cada pessoa dava quanto a atividade cerebral, especificamente no córtex orbitofrontal medial (mOFC), região associada à experiência real de prazer.",
+        experimentText: "Quando achavam que estavam bebendo o vinho mais caro, os participantes relatavam mais prazer E o córtex orbitofrontal medial mostrava mais atividade. O preço não mudou só a opinião declarada — mudou a experiência sensorial registrada no próprio cérebro, medida objetivamente por imagem, não só por autorrelato.",
         apply: "Baixar o preço pra 'facilitar a venda' pode literalmente diminuir o prazer que a pessoa sente com o que você vende. Preço não é só uma barreira de entrada — é um ingrediente da experiência.",
         repertoire: {
           category: "Astronomia",
@@ -582,7 +603,12 @@ function render() {
       </div>
       <div class="day-body">
         <div class="quote">“${d.quote}”<small>${d.quoteNote}</small></div>
-        <div class="exp-title">${d.experimentTitle}</div>
+        <div class="mini-label">🧠 Quem é ${d.scientist}</div>
+        <div class="exp-text">${d.scientistBio}</div>
+        <div class="exp-title" style="margin-top:16px;">${d.experimentTitle}</div>
+        <div class="mini-label">🔬 Método</div>
+        <div class="exp-text">${d.method}</div>
+        <div class="mini-label">📊 O que descobriram</div>
         <div class="exp-text">${d.experimentText}</div>
         <div class="apply"><b>Aplicação real:</b> ${d.apply}</div>
         <div class="checklist">
