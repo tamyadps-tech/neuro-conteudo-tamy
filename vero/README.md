@@ -5,9 +5,10 @@ palestrantes — com vetting de credenciais, avaliações públicas e progresso
 visual sem login. Ver [`BRANDING.md`](./BRANDING.md) para nome, cores e
 tom de voz, e [`docs/planning/`](./docs/planning) para o PRD original.
 
-**Estágio atual**: pré-lançamento. A landing page captura interesse de
-clientes e profissionais numa lista de espera; o marketplace completo
-(agenda, prontuário, pagamento) ainda não foi construído.
+**Estágio atual**: pré-lançamento, ainda não está no ar. A landing page
+captura interesse na lista de espera, e já existe o fluxo de cadastro e
+vetting de profissional (formulário público + painel admin). Agenda,
+prontuário compartilhado e pagamento ainda não foram construídos.
 
 ## Stack
 
@@ -30,10 +31,15 @@ npm run dev
 
 Abre em [http://localhost:3000](http://localhost:3000).
 
-Para a lista de espera funcionar de verdade (gravar no banco em vez de
-retornar 503), copie `.env.example` para `.env.local` e preencha
-`SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` de um projeto Supabase com a
-migration `0001_waitlist.sql` aplicada.
+Copie `.env.example` para `.env.local` e preencha:
+
+- `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — de um projeto Supabase com
+  as migrations de `supabase/migrations/` aplicadas. Sem isso, a lista de
+  espera e o cadastro de profissional respondem 503 em vez de gravar.
+- `ADMIN_USER` / `ADMIN_PASSWORD` — credenciais de HTTP Basic Auth pra
+  acessar `/admin` (visão geral, fila de vetting). Sem isso, `/admin`
+  responde 503. É proteção mínima pra "só vocês dois" — trocar por login de
+  verdade (Supabase Auth) antes de dar acesso a mais gente.
 
 ## Testes
 
@@ -48,9 +54,18 @@ npm run build      # build de produção + checagem de tipos
 
 ```
 src/
-  app/            # rotas (landing, /termos, /privacidade, /api/waitlist)
-  components/     # componentes de UI da landing page
-  lib/            # markdown renderer, cliente Supabase (server-only)
+  app/
+    (landing, /termos, /privacidade)
+    profissionais/cadastro/  # formulário público de candidatura
+    admin/                   # visão geral (BI), fila de vetting, assinaturas (placeholder)
+    api/
+      waitlist/               # POST lista de espera
+      professionals/apply/    # POST candidatura de profissional
+      admin/professionals/[id]/ # PATCH aprovar/rejeitar (protegido pelo proxy)
+  components/       # UI da landing page + admin/ (painel)
+  lib/              # markdown renderer, cliente Supabase (server-only),
+                     # métricas de BI, categorias/formatos compartilhados
+  proxy.ts          # HTTP Basic Auth em /admin e /api/admin (Next 16 "proxy")
 docs/
   legal/          # Termo de Uso e Política de Privacidade (fonte .md)
   email-templates/ # template de resumo de sessão com a marca Vero
@@ -60,6 +75,22 @@ supabase/
 e2e/              # testes Playwright
 ```
 
+## O que já dá pra fazer
+
+- Visitante entra na lista de espera (cliente ou profissional)
+- Profissional se candidata em `/profissionais/cadastro`, informando
+  categoria, anos de experiência, especialidades, métodos/abordagens,
+  estilo de atendimento e formato (online/presencial/híbrido, com
+  cidade/estado quando há ponto físico)
+- Vocês dois revisam candidaturas em `/admin/profissionais` e
+  aprovam/rejeitam
+- `/admin` mostra métricas (lista de espera, profissionais por status e
+  categoria) — a base do painel de BI. Assinaturas fica como placeholder
+  até existir cobrança (Stripe)
+
+Tudo isso funciona sem quebrar mesmo sem Supabase configurado: as rotas
+respondem 503 com uma mensagem clara em vez de dar erro.
+
 ## Próximos passos
 
 1. **Revisão jurídica**: os documentos em `docs/legal/` têm campos
@@ -68,7 +99,10 @@ e2e/              # testes Playwright
 2. **Provisionar Supabase**: criar o projeto real e aplicar as migrations
    em `supabase/migrations/` (isso tem passo de aprovação separado, por
    envolver criar um recurso de conta — perguntar antes de criar).
-3. **Domínio**: registrar `vero.app` ou equivalente e configurar deploy
-   (Vercel free tier é suficiente nesta fase).
-4. Construir o marketplace em si: cadastro/vetting de profissionais,
-   agenda, prontuário compartilhado, e o fluxo de progresso sem login.
+3. **Login de verdade no admin**: trocar o Basic Auth por Supabase Auth
+   assim que mais de vocês dois precisar de acesso.
+4. **Domínio e deploy**: registrar domínio e colocar no ar — combinado que
+   isso só acontece depois que o produto estiver mais construído.
+5. Continuar o marketplace: perfil público do profissional + busca, agenda,
+   prontuário compartilhado, progresso sem login, e cobrança (Stripe) —
+   isso também destrava a seção "Assinaturas" do admin.

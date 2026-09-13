@@ -16,17 +16,31 @@ create type professional_category as enum (
 
 create type vetting_status as enum ('pendente', 'aprovado', 'rejeitado');
 
+create type session_format as enum ('online', 'presencial', 'hibrido');
+
 create table professionals (
   id uuid primary key default gen_random_uuid(),
   full_name text not null,
   email text not null unique,
   category professional_category not null,
   bio text,
+  years_experience smallint not null default 0 check (years_experience >= 0),
+  specialties text[] not null default '{}',
+  methods text[] not null default '{}',
+  personality text,
+  session_format session_format not null default 'online',
+  location_city text,
+  location_state text,
+  location_address text,
   price_cents integer not null check (price_cents >= 0),
   vetting_status vetting_status not null default 'pendente',
   vetting_notes text,
   credential_document_url text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint location_required_unless_online check (
+    session_format = 'online'
+    or (location_city is not null and location_state is not null)
+  )
 );
 
 -- Clientes não têm senha: acessam o próprio progresso por link único
