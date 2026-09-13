@@ -56,8 +56,9 @@ npm run build      # build de produção + checagem de tipos
 src/
   app/
     (landing, /termos, /privacidade)
-    profissionais/cadastro/  # formulário público de candidatura
-    admin/                   # visão geral (BI), fila de vetting, assinaturas (placeholder)
+    profissionais/            # busca (/profissionais) e perfil público (/profissionais/[id])
+    profissionais/cadastro/   # formulário público de candidatura
+    admin/                    # visão geral (BI), fila de vetting, assinaturas (placeholder)
     api/
       waitlist/               # POST lista de espera
       professionals/apply/    # POST candidatura de profissional
@@ -87,6 +88,10 @@ e2e/              # testes Playwright
 - `/admin` mostra métricas (lista de espera, profissionais por status e
   categoria) — a base do painel de BI. Assinaturas fica como placeholder
   até existir cobrança (Stripe)
+- Cliente busca profissionais aprovados em `/profissionais` (filtro por
+  categoria, formato, texto) e vê o perfil público em
+  `/profissionais/[id]` — sem agendamento ainda, isso é honesto na própria
+  página ("Agendamento chega em breve")
 
 Tudo isso funciona sem quebrar mesmo sem Supabase configurado: as rotas
 respondem 503 com uma mensagem clara em vez de dar erro.
@@ -103,6 +108,6 @@ respondem 503 com uma mensagem clara em vez de dar erro.
    assim que mais de vocês dois precisar de acesso.
 4. **Domínio e deploy**: registrar domínio e colocar no ar — combinado que
    isso só acontece depois que o produto estiver mais construído.
-5. Continuar o marketplace: perfil público do profissional + busca, agenda,
-   prontuário compartilhado, progresso sem login, e cobrança (Stripe) —
-   isso também destrava a seção "Assinaturas" do admin.
+5. Continuar o marketplace: agenda, prontuário compartilhado, progresso sem
+   login, e cobrança (Stripe) — isso também destrava a seção "Assinaturas"
+   do admin.
