@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumo da Sua Sessão — Vero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+            color: #1b2421;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #0f6e64 0%, #0a4f48 100%);
+            color: #fbf8f3;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 30px 20px;
+            background-color: #ffffff;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #1b2421;
+        }
+        .greeting strong {
+            color: #0f6e64;
+        }
+        .section {
+            margin-bottom: 30px;
+            border-left: 4px solid #0f6e64;
+            padding-left: 20px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f6e64;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .section-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #5b6763;
+        }
+        .topics {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .topic-item {
+            padding: 8px 0;
+            font-size: 14px;
+            color: #5b6763;
+        }
+        .topic-item:before {
+            content: "✓ ";
+            color: #0f6e64;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .progress-box {
+            background: linear-gradient(135deg, #0f6e6415 0%, #0a4f4815 100%);
+            border: 1px solid #0f6e64;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0f6e64;
+            margin-bottom: 8px;
+        }
+        .progress-label {
+            font-size: 14px;
+            color: #5b6763;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e4dccc;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0f6e64 0%, #0a4f48 100%);
+            width: {{progress_percentage}}%;
+            transition: width 0.3s ease;
+        }
+        .next-session {
+            background-color: #e4f2ef;
+            border-left: 4px solid #0f6e64;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .next-session-label {
+            font-size: 12px;
+            color: #0f6e64;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .next-session-time {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1b2421;
+        }
+        .homework-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #fbc02d;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .homework-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f57c00;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .homework-task {
+            font-size: 14px;
+            color: #5b6763;
+            margin-bottom: 8px;
+            padding-left: 20px;
+        }
+        .homework-task:before {
+            content: "📋 ";
+            margin-right: 8px;
+        }
+        .homework-deadline {
+            font-size: 12px;
+            color: #f57c00;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #0f6e64 0%, #0a4f48 100%);
+            color: #fbf8f3;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: transform 0.2s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 110, 100, 0.4);
+        }
+        .message-from-professional {
+            background-color: #fdece4;
+            border-left: 4px solid #e9673f;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .message-from-professional-label {
+            font-size: 12px;
+            color: #c94e29;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .message-text {
+            font-size: 14px;
+            color: #c94e29;
+            line-height: 1.8;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #e4dccc;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: #5b6763;
+            margin-bottom: 10px;
+        }
+        .footer-links {
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .footer-links a {
+            color: #0f6e64;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .rating-section {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .rating-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1b2421;
+            margin-bottom: 12px;
+        }
+        .rating-link {
+            display: inline-block;
+            background-color: #e9673f;
+            color: #fbf8f3;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .rating-link:hover {
+            background-color: #c94e29;
+        }
+        .divider {
+            height: 1px;
+            background-color: #e4dccc;
+            margin: 20px 0;
+        }
+        .emoji {
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📋 Resumo da Sua Sessão</h1>
+            <p>{{professional_name}} | {{session_date}}</p>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- GREETING -->
+            <div class="greeting">
+                Olá <strong>{{client_name}}</strong>,
+            </div>
+            <p style="margin-bottom: 20px; font-size: 14px; color: #5b6763;">
+                Aqui está um resumo completo da sua sessão de {{session_date_formatted}}. Você pode acompanhar seu progresso e tarefas abaixo.
+            </p>
+
+            <div class="divider"></div>
+
+            <!-- PROGRESS SECTION -->
+            {{#if progress_percentage}}
+            <div class="section">
+                <div class="section-title"><span class="emoji">📈</span>Seu Progresso</div>
+                <div class="progress-box">
+                    <div class="progress-number">{{progress_percentage}}%</div>
+                    <div class="progress-label">{{progress_label}}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- TOPICS SECTION -->
+            {{#if topics}}
+            <div class="section">
+                <div class="section-title"><span class="emoji">💬</span>Tópicos Abordados</div>
+                <div class="topics">
+                    {{#each topics}}
+                    <div class="topic-item">{{this}}</div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- GOALS SECTION -->
+            {{#if goals}}
+            <div class="section">
+                <div class="section-title"><span class="emoji">🎯</span>Metas Definidas</div>
+                <div class="section-content">
+                    {{#each goals}}
+                    <div style="margin-bottom: 12px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
+                        <strong style="color: #0f6e64;">{{this.goal_name}}</strong>
+                        <br/>
+                        <small style="color: #5b6763;">Prazo: {{this.target_date}}</small>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- MESSAGE FROM PROFESSIONAL -->
+            {{#if professional_message}}
+            <div class="message-from-professional">
+                <div class="message-from-professional-label">💌 Mensagem de {{professional_name}}</div>
+                <div class="message-text">
+                    {{professional_message}}
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- HOMEWORK SECTION -->
+            {{#if homework}}
+            <div class="homework-box">
+                <div class="homework-title"><span class="emoji">📝</span>Sua Tarefa Até a Próxima Sessão</div>
+                {{#each homework}}
+                <div class="homework-task">
+                    {{this.task_description}}
+                </div>
+                <div class="homework-deadline">
+                    ⏰ Prazo: {{this.deadline}}
+                </div>
+                {{#if this.task_link}}
+                <a href="{{this.task_link}}" class="cta-button" style="margin-top: 10px; margin-bottom: 10px;">
+                    Preencher Tarefa
+                </a>
+                {{/if}}
+                {{#unless @last}}<div style="margin-top: 15px; border-bottom: 1px solid #e4dccc;"></div>{{/unless}}
+                {{/each}}
+            </div>
+            {{/if}}
+
+            <!-- NEXT SESSION -->
+            {{#if next_session}}
+            <div class="next-session">
+                <div class="next-session-label">📅 Próxima Sessão Agendada</div>
+                <div class="next-session-time">
+                    {{next_session_date}} às {{next_session_time}}
+                </div>
+                {{#if cancel_link}}
+                <a href="{{cancel_link}}" style="font-size: 12px; color: #0f6e64; text-decoration: none; margin-top: 8px; display: inline-block;">
+                    Reagendar ou Cancelar →
+                </a>
+                {{/if}}
+            </div>
+            {{/if}}
+
+            <!-- CTA: VIEW FULL PROGRESS -->
+            <div style="text-align: center;">
+                <a href="{{dashboard_link}}" class="cta-button">
+                    Ver Seu Dashboard Completo
+                </a>
+            </div>
+
+            <!-- RATING SECTION -->
+            <div class="rating-section">
+                <div class="rating-label">Como foi sua sessão?</div>
+                <p style="font-size: 12px; color: #5b6763; margin-bottom: 12px;">
+                    Sua avaliação nos ajuda a melhorar
+                </p>
+                <a href="{{rating_link}}" class="rating-link">
+                    ⭐ Avaliar Sessão
+                </a>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- QUESTIONS SECTION -->
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center;">
+                <p style="font-size: 14px; color: #5b6763; margin-bottom: 10px;">
+                    Alguma dúvida?
+                </p>
+                <p style="font-size: 13px; color: #5b6763;">
+                    Você pode <a href="mailto:{{professional_email}}" style="color: #0f6e64; text-decoration: none;">enviar um email</a> para {{professional_name}}
+                    ou contatar nosso suporte em <a href="mailto:suporte@vero.app" style="color: #0f6e64; text-decoration: none;">suporte@vero.app</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p class="footer-text">
+                Este é um email automático da Vero. Não responda direto a este email.
+            </p>
+            <div class="footer-links">
+                <a href="{{profile_link}}">Meu Perfil</a> |
+                <a href="{{privacy_link}}">Privacidade</a> |
+                <a href="{{contact_link}}">Contato</a>
+            </div>
+            <p class="footer-text">
+                <strong>Vero</strong><br/>
+                Email: {{support_email}}<br/>
+                Telefone: {{support_phone}}
+            </p>
+            <p class="footer-text" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e4dccc; font-size: 11px;">
+                © 2026 {{company_name}}. Todos os direitos reservados.<br/>
+                Você recebe este email porque é cliente da Vero.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
+<!--
+    ===================================
+    INSTRUÇÕES DE USO
+    ===================================
+    Adaptado do template original com as cores e o nome da marca Vero
+    (verde-petróleo #0F6E64 + terracota #E9673F). Variáveis Handlebars e
+    instruções de integração (Zapier/SendGrid) são as mesmas do template
+    original — ver histórico de conversa ou BRANDING.md para a paleta
+    completa antes de customizar mais.
+
+    Exemplo de dados:
+    {
+      "client_name": "João Silva",
+      "professional_name": "Dra. Maria",
+      "session_date": "15 de Janeiro de 2026",
+      "session_date_formatted": "15 de janeiro de 2026",
+      "progress_percentage": 65,
+      "progress_label": "Redução de Ansiedade",
+      "topics": ["Técnicas de respiração", "Mindfulness", "Gestão de estresse"],
+      "goals": [
+        {"goal_name": "Dormir 7h por noite", "target_date": "30 de janeiro"},
+        {"goal_name": "Reduzir palpitações", "target_date": "15 de fevereiro"}
+      ],
+      "homework": [
+        {"task_description": "Praticar respiração profunda 5 minutos por dia", "deadline": "até segunda-feira", "task_link": "https://vero.app/c/task123"}
+      ],
+      "professional_message": "João, você está progredindo muito bem! Continue com as práticas.",
+      "next_session_date": "22 de janeiro",
+      "next_session_time": "14:00",
+      "professional_email": "maria@email.com",
+      "rating_link": "https://vero.app/c/rate789",
+      "dashboard_link": "https://vero.app/c/uuid-cliente-unico",
+      "support_email": "suporte@vero.app",
+      "support_phone": "(61) 9999-9999",
+      "company_name": "Vero"
+    }
+    ===================================
+-->
