@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 import { SESSION_FORMAT_LABELS } from "@/lib/session-format";
@@ -63,7 +64,12 @@ export function ProfessionalRow({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-ink">{professional.full_name}</h3>
+            <Link
+              href={`/admin/profissionais/${professional.id}`}
+              className="font-semibold text-ink hover:underline"
+            >
+              {professional.full_name}
+            </Link>
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[professional.vetting_status]}`}
             >

@@ -84,6 +84,16 @@ export default async function AdminOverviewPage() {
 
             <section className="mt-10">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
+                Sessões
+              </h2>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                <MetricCard label="Agendadas" value={metrics.sessions.agendadas} />
+                <MetricCard label="Concluídas" value={metrics.sessions.concluidas} />
+              </div>
+            </section>
+
+            <section className="mt-10">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
                 Assinaturas &amp; receita
               </h2>
               <div className="mt-3 rounded-2xl border border-dashed border-border bg-paper-alt/40 p-6 text-sm text-ink-soft">

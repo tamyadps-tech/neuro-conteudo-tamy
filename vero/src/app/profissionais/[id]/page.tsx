@@ -5,6 +5,8 @@ import { Footer } from "@/components/Footer";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 import { SESSION_FORMAT_LABELS } from "@/lib/session-format";
 import { getApprovedProfessional } from "@/lib/public-professionals";
+import { getUpcomingSlotsForProfessional } from "@/lib/booking";
+import { BookingWidget } from "@/components/BookingWidget";
 
 function formatPrice(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", {
@@ -58,6 +60,7 @@ export default async function ProfessionalProfilePage({
   }
 
   const professional = lookup.professional;
+  const upcomingSlots = await getUpcomingSlotsForProfessional(id);
 
   return (
     <>
@@ -126,16 +129,26 @@ export default async function ProfessionalProfilePage({
             )}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-paper p-6">
-            <div>
+          <div className="mt-8 rounded-2xl border border-border bg-paper p-6 sm:p-8">
+            <div className="mb-5 flex items-center justify-between">
               <p className="text-sm text-ink-soft">Sessão individual</p>
               <p className="text-2xl font-semibold text-ink">
                 {formatPrice(professional.price_cents)}
               </p>
             </div>
-            <span className="rounded-full bg-paper-alt px-4 py-2 text-sm font-medium text-ink-soft">
-              Agendamento chega em breve
-            </span>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-soft">
+              Horários disponíveis
+            </h2>
+            {upcomingSlots === null ? (
+              <span className="inline-block rounded-full bg-paper-alt px-4 py-2 text-sm font-medium text-ink-soft">
+                Agendamento chega em breve
+              </span>
+            ) : (
+              <BookingWidget
+                professionalId={professional.id}
+                slotsIso={upcomingSlots.map((slot) => slot.toISOString())}
+              />
+            )}
           </div>
 
           <p className="mt-4 text-center text-xs text-ink-soft">

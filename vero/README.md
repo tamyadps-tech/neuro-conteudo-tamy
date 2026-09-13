@@ -6,9 +6,10 @@ visual sem login. Ver [`BRANDING.md`](./BRANDING.md) para nome, cores e
 tom de voz, e [`docs/planning/`](./docs/planning) para o PRD original.
 
 **Estágio atual**: pré-lançamento, ainda não está no ar. A landing page
-captura interesse na lista de espera, e já existe o fluxo de cadastro e
-vetting de profissional (formulário público + painel admin). Agenda,
-prontuário compartilhado e pagamento ainda não foram construídos.
+captura interesse na lista de espera; já existem cadastro/vetting de
+profissional, busca/perfil público e agendamento de sessão. Prontuário
+compartilhado, progresso sem login e pagamento ainda não foram
+construídos.
 
 ## Stack
 
@@ -57,15 +58,22 @@ src/
   app/
     (landing, /termos, /privacidade)
     profissionais/            # busca (/profissionais) e perfil público (/profissionais/[id])
+                              # com o widget de agendamento
     profissionais/cadastro/   # formulário público de candidatura
-    admin/                    # visão geral (BI), fila de vetting, assinaturas (placeholder)
+    admin/                    # visão geral (BI), fila de vetting,
+                              # detalhe+disponibilidade do profissional,
+                              # assinaturas (placeholder)
     api/
-      waitlist/               # POST lista de espera
-      professionals/apply/    # POST candidatura de profissional
-      admin/professionals/[id]/ # PATCH aprovar/rejeitar (protegido pelo proxy)
+      waitlist/                    # POST lista de espera
+      professionals/apply/         # POST candidatura de profissional
+      sessions/book/                # POST agendar sessão
+      admin/professionals/[id]/     # PATCH aprovar/rejeitar
+      admin/.../availability/       # POST/DELETE horários (protegido pelo proxy)
   components/       # UI da landing page + admin/ (painel)
   lib/              # markdown renderer, cliente Supabase (server-only),
-                     # métricas de BI, categorias/formatos compartilhados
+                     # métricas de BI, categorias/formatos compartilhados,
+                     # cálculo de horários disponíveis (availability.ts,
+                     # puro e testado isoladamente)
   proxy.ts          # HTTP Basic Auth em /admin e /api/admin (Next 16 "proxy")
 docs/
   legal/          # Termo de Uso e Política de Privacidade (fonte .md)
@@ -89,9 +97,12 @@ e2e/              # testes Playwright
   categoria) — a base do painel de BI. Assinaturas fica como placeholder
   até existir cobrança (Stripe)
 - Cliente busca profissionais aprovados em `/profissionais` (filtro por
-  categoria, formato, texto) e vê o perfil público em
-  `/profissionais/[id]` — sem agendamento ainda, isso é honesto na própria
-  página ("Agendamento chega em breve")
+  categoria, formato, texto) e vê o perfil público em `/profissionais/[id]`
+- Vocês cadastram a disponibilidade semanal recorrente de cada profissional
+  em `/admin/profissionais/[id]` (sem dashboard de profissional ainda);
+  cliente escolhe um horário no perfil público, preenche nome/email e
+  agenda. O servidor sempre recalcula a disponibilidade de verdade antes de
+  confirmar, pra evitar duplo agendamento
 
 Tudo isso funciona sem quebrar mesmo sem Supabase configurado: as rotas
 respondem 503 com uma mensagem clara em vez de dar erro.
@@ -108,6 +119,6 @@ respondem 503 com uma mensagem clara em vez de dar erro.
    assim que mais de vocês dois precisar de acesso.
 4. **Domínio e deploy**: registrar domínio e colocar no ar — combinado que
    isso só acontece depois que o produto estiver mais construído.
-5. Continuar o marketplace: agenda, prontuário compartilhado, progresso sem
-   login, e cobrança (Stripe) — isso também destrava a seção "Assinaturas"
-   do admin.
+5. Continuar o marketplace: prontuário compartilhado, progresso sem login,
+   email de confirmação/lembrete de sessão, e cobrança (Stripe) — isso
+   também destrava a seção "Assinaturas" do admin.

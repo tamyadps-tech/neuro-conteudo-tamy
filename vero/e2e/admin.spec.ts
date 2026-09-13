@@ -19,6 +19,13 @@ test("admin area is reachable with the right credentials", async ({
   await page.goto("/admin/profissionais");
   await expect(page.getByRole("heading", { name: /profissionais/i })).toBeVisible();
 
+  // Sem Supabase configurado neste ambiente, o detalhe de um profissional
+  // qualquer mostra o estado "não configurado" em vez de quebrar.
+  await page.goto("/admin/profissionais/11111111-1111-1111-1111-111111111111");
+  await expect(
+    page.getByText(/supabase ainda não está configurado/i)
+  ).toBeVisible();
+
   await context.close();
 });
 

@@ -10,6 +10,7 @@ export interface AdminMetrics {
     rejeitado: number;
     byCategory: Partial<Record<ProfessionalCategory, number>>;
   };
+  sessions: { agendadas: number; concluidas: number };
 }
 
 /** Retorna null quando o Supabase ainda não está configurado. */
@@ -17,10 +18,12 @@ export async function getAdminMetrics(): Promise<AdminMetrics | null> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return null;
 
-  const [{ data: waitlistRows }, { data: professionalRows }] = await Promise.all([
-    supabase.from("waitlist_signups").select("role"),
-    supabase.from("professionals").select("vetting_status, category"),
-  ]);
+  const [{ data: waitlistRows }, { data: professionalRows }, { data: sessionRows }] =
+    await Promise.all([
+      supabase.from("waitlist_signups").select("role"),
+      supabase.from("professionals").select("vetting_status, category"),
+      supabase.from("sessions").select("status"),
+    ]);
 
   const waitlist = { total: 0, clientes: 0, profissionais: 0 };
   for (const row of waitlistRows ?? []) {
@@ -47,5 +50,11 @@ export async function getAdminMetrics(): Promise<AdminMetrics | null> {
       (professionals.byCategory[category] ?? 0) + 1;
   }
 
-  return { waitlist, professionals };
+  const sessions = { agendadas: 0, concluidas: 0 };
+  for (const row of sessionRows ?? []) {
+    if (row.status === "agendada") sessions.agendadas += 1;
+    if (row.status === "concluida") sessions.concluidas += 1;
+  }
+
+  return { waitlist, professionals, sessions };
 }
