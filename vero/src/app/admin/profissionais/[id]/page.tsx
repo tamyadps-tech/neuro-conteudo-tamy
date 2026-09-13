@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { AvailabilityManager } from "@/components/admin/AvailabilityManager";
+import { SessionRow } from "@/components/admin/SessionRow";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 import { SESSION_FORMAT_LABELS } from "@/lib/session-format";
 import { getProfessional } from "@/lib/admin-professionals";
 import { listAvailabilitySlots } from "@/lib/booking";
+import { listSessionsForProfessional } from "@/lib/admin-sessions";
 
 export default async function AdminProfessionalDetailPage({
   params,
@@ -31,6 +33,7 @@ export default async function AdminProfessionalDetailPage({
 
   const professional = lookup.professional;
   const slots = await listAvailabilitySlots(id);
+  const sessions = await listSessionsForProfessional(id);
 
   return (
     <>
@@ -59,6 +62,30 @@ export default async function AdminProfessionalDetailPage({
               </p>
             ) : (
               <AvailabilityManager professionalId={id} slots={slots} />
+            )}
+          </div>
+        </section>
+
+        <section className="mt-10">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
+            Sessões e prontuário
+          </h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Sem dashboard de profissional ainda, o registro de cada sessão
+            (tópicos, tarefa, próxima sessão) também é feito pela equipe. O
+            cliente vê isso no próprio link de progresso.
+          </p>
+          <div className="mt-4 space-y-3">
+            {sessions === null ? (
+              <p className="text-sm text-ink-soft">
+                Supabase ainda não está configurado.
+              </p>
+            ) : sessions.length === 0 ? (
+              <p className="text-sm text-ink-soft">Nenhuma sessão ainda.</p>
+            ) : (
+              sessions.map((session) => (
+                <SessionRow key={session.id} session={session} />
+              ))
             )}
           </div>
         </section>

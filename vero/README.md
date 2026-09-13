@@ -7,9 +7,8 @@ tom de voz, e [`docs/planning/`](./docs/planning) para o PRD original.
 
 **Estágio atual**: pré-lançamento, ainda não está no ar. A landing page
 captura interesse na lista de espera; já existem cadastro/vetting de
-profissional, busca/perfil público e agendamento de sessão. Prontuário
-compartilhado, progresso sem login e pagamento ainda não foram
-construídos.
+profissional, busca/perfil público, agendamento de sessão, prontuário
+compartilhado e progresso sem login. Falta email automático e pagamento.
 
 ## Stack
 
@@ -61,14 +60,16 @@ src/
                               # com o widget de agendamento
     profissionais/cadastro/   # formulário público de candidatura
     admin/                    # visão geral (BI), fila de vetting,
-                              # detalhe+disponibilidade do profissional,
-                              # assinaturas (placeholder)
+                              # detalhe do profissional (disponibilidade +
+                              # prontuário das sessões), assinaturas (placeholder)
+    c/[token]/                # progresso do cliente, sem login (link único)
     api/
       waitlist/                    # POST lista de espera
       professionals/apply/         # POST candidatura de profissional
       sessions/book/                # POST agendar sessão
       admin/professionals/[id]/     # PATCH aprovar/rejeitar
       admin/.../availability/       # POST/DELETE horários (protegido pelo proxy)
+      admin/sessions/[id]/          # PATCH tópicos/tarefa/status da sessão
   components/       # UI da landing page + admin/ (painel)
   lib/              # markdown renderer, cliente Supabase (server-only),
                      # métricas de BI, categorias/formatos compartilhados,
@@ -103,6 +104,12 @@ e2e/              # testes Playwright
   cliente escolhe um horário no perfil público, preenche nome/email e
   agenda. O servidor sempre recalcula a disponibilidade de verdade antes de
   confirmar, pra evitar duplo agendamento
+- Depois da sessão, vocês registram tópicos abordados, tarefa e próxima
+  sessão em `/admin/profissionais/[id]` (o "prontuário" — sem dashboard de
+  profissional ainda, é manual)
+- Ao agendar, o cliente recebe na tela (ainda sem email automático) um link
+  pessoal `/c/[token]` — sem login — onde vê a próxima sessão e o histórico
+  com tópicos/tarefas de cada sessão passada
 
 Tudo isso funciona sem quebrar mesmo sem Supabase configurado: as rotas
 respondem 503 com uma mensagem clara em vez de dar erro.
@@ -119,6 +126,7 @@ respondem 503 com uma mensagem clara em vez de dar erro.
    assim que mais de vocês dois precisar de acesso.
 4. **Domínio e deploy**: registrar domínio e colocar no ar — combinado que
    isso só acontece depois que o produto estiver mais construído.
-5. Continuar o marketplace: prontuário compartilhado, progresso sem login,
-   email de confirmação/lembrete de sessão, e cobrança (Stripe) — isso
-   também destrava a seção "Assinaturas" do admin.
+5. Continuar o marketplace: email automático de confirmação/lembrete/resumo
+   de sessão (template já pronto em `docs/email-templates/`, falta o envio
+   de verdade), avaliações públicas, e cobrança (Stripe) — isso também
+   destrava a seção "Assinaturas" do admin.

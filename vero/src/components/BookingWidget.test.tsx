@@ -26,7 +26,7 @@ describe("BookingWidget", () => {
     const fetchMock = fetch as unknown as ReturnType<typeof vi.fn>;
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ ok: true }),
+      json: async () => ({ ok: true, progressToken: "token-123" }),
     });
 
     const user = userEvent.setup();
@@ -40,6 +40,10 @@ describe("BookingWidget", () => {
 
     await waitFor(() =>
       expect(screen.getByText(/sessão agendada/i)).toBeInTheDocument()
+    );
+    expect(screen.getByRole("link", { name: /token-123/ })).toHaveAttribute(
+      "href",
+      "/c/token-123"
     );
 
     const [, options] = fetchMock.mock.calls[0];

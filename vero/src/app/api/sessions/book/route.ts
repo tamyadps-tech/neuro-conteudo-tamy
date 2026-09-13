@@ -67,7 +67,7 @@ export async function POST(request: Request) {
   const { data: client, error: clientError } = await supabase
     .from("clients")
     .upsert({ full_name: fullName, email }, { onConflict: "email" })
-    .select("id")
+    .select("id, access_token")
     .single();
 
   if (clientError || !client) {
@@ -93,5 +93,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, progressToken: client.access_token });
 }

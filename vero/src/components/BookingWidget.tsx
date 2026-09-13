@@ -26,6 +26,7 @@ export function BookingWidget({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("picking");
   const [message, setMessage] = useState("");
+  const [progressToken, setProgressToken] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,6 +51,7 @@ export function BookingWidget({
         throw new Error(data.error ?? "Não foi possível agendar agora.");
       }
 
+      setProgressToken(data.progressToken ?? null);
       setStatus("success");
     } catch (error) {
       setStatus("error");
@@ -72,9 +74,21 @@ export function BookingWidget({
   if (status === "success") {
     return (
       <div className="rounded-2xl border border-primary/30 bg-primary-light px-6 py-5 text-center">
-        <p className="font-medium text-primary-dark">
-          Sessão agendada! Você vai receber um email de confirmação.
-        </p>
+        <p className="font-medium text-primary-dark">Sessão agendada!</p>
+        {progressToken && (
+          <>
+            <p className="mt-2 text-sm text-primary-dark">
+              Guarde este link — é como você acompanha o progresso das suas
+              sessões, sem precisar de senha:
+            </p>
+            <a
+              href={`/c/${progressToken}`}
+              className="mt-2 inline-block break-all text-sm font-medium text-primary-dark underline"
+            >
+              /c/{progressToken}
+            </a>
+          </>
+        )}
       </div>
     );
   }
