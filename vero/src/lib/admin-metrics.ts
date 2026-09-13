@@ -11,6 +11,7 @@ export interface AdminMetrics {
     byCategory: Partial<Record<ProfessionalCategory, number>>;
   };
   sessions: { agendadas: number; concluidas: number };
+  revenue: { totalCents: number; pagas: number; pendentesCents: number };
 }
 
 /** Retorna null quando o Supabase ainda não está configurado. */
@@ -18,12 +19,17 @@ export async function getAdminMetrics(): Promise<AdminMetrics | null> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return null;
 
-  const [{ data: waitlistRows }, { data: professionalRows }, { data: sessionRows }] =
-    await Promise.all([
-      supabase.from("waitlist_signups").select("role"),
-      supabase.from("professionals").select("vetting_status, category"),
-      supabase.from("sessions").select("status"),
-    ]);
+  const [
+    { data: waitlistRows },
+    { data: professionalRows },
+    { data: sessionRows },
+    { data: paymentRows },
+  ] = await Promise.all([
+    supabase.from("waitlist_signups").select("role"),
+    supabase.from("professionals").select("vetting_status, category"),
+    supabase.from("sessions").select("status"),
+    supabase.from("payments").select("status, amount_cents"),
+  ]);
 
   const waitlist = { total: 0, clientes: 0, profissionais: 0 };
   for (const row of waitlistRows ?? []) {
@@ -56,5 +62,16 @@ export async function getAdminMetrics(): Promise<AdminMetrics | null> {
     if (row.status === "concluida") sessions.concluidas += 1;
   }
 
-  return { waitlist, professionals, sessions };
+  const revenue = { totalCents: 0, pagas: 0, pendentesCents: 0 };
+  for (const row of paymentRows ?? []) {
+    if (row.status === "pago") {
+      revenue.totalCents += row.amount_cents;
+      revenue.pagas += 1;
+    }
+    if (row.status === "pendente") {
+      revenue.pendentesCents += row.amount_cents;
+    }
+  }
+
+  return { waitlist, professionals, sessions, revenue };
 }

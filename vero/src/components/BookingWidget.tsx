@@ -51,6 +51,11 @@ export function BookingWidget({
         throw new Error(data.error ?? "Não foi possível agendar agora.");
       }
 
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
       setProgressToken(data.progressToken ?? null);
       setStatus("success");
     } catch (error) {

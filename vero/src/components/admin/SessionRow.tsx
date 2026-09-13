@@ -12,6 +12,24 @@ const STATUS_LABELS: Record<SessionStatus, string> = {
   cancelada_profissional: "Cancelada (profissional)",
 };
 
+const PAYMENT_LABELS: Record<string, string> = {
+  pendente: "Pagamento pendente",
+  pago: "Pago",
+  falhou: "Pagamento falhou",
+  reembolsado: "Reembolsado",
+};
+
+const PAYMENT_STYLES: Record<string, string> = {
+  pendente: "bg-accent-light text-accent-dark",
+  pago: "bg-primary-light text-primary-dark",
+  falhou: "bg-paper-alt text-ink-soft",
+  reembolsado: "bg-paper-alt text-ink-soft",
+};
+
+function formatPrice(cents: number) {
+  return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
@@ -75,6 +93,14 @@ export function SessionRow({ session }: { session: AdminSession }) {
           <p className="text-xs text-ink-soft">
             {session.client?.email} · {dateFormatter.format(new Date(session.scheduled_at))}
           </p>
+          {session.payment && (
+            <span
+              className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs ${PAYMENT_STYLES[session.payment.status]}`}
+            >
+              {PAYMENT_LABELS[session.payment.status]} ·{" "}
+              {formatPrice(session.payment.amount_cents)}
+            </span>
+          )}
         </div>
         <select
           value={status}

@@ -23,10 +23,13 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default async function ClientProgressPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { token } = await params;
+  const { pago } = await searchParams;
   const lookup = await getClientProgress(token);
 
   if (!lookup.configured) {
@@ -87,6 +90,14 @@ export default async function ClientProgressPage({
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-ink">
             Olá, {client.full_name.split(" ")[0]}
           </h1>
+
+          {pago === "1" && (
+            <div className="mt-4 rounded-xl border border-primary/30 bg-primary-light px-4 py-3">
+              <p className="text-sm font-medium text-primary-dark">
+                Pagamento confirmado! Sua sessão está garantida.
+              </p>
+            </div>
+          )}
 
           {nextSession && (
             <div className="mt-8 rounded-2xl border border-primary/30 bg-primary-light p-6">

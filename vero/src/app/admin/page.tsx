@@ -3,6 +3,10 @@ import { MetricCard } from "@/components/admin/MetricCard";
 import { getAdminMetrics } from "@/lib/admin-metrics";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 
+function formatPrice(cents: number) {
+  return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 export default async function AdminOverviewPage() {
   const metrics = await getAdminMetrics();
 
@@ -14,8 +18,7 @@ export default async function AdminOverviewPage() {
           Visão geral
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Métricas em tempo real da Vero. Assinaturas e receita entram aqui
-          assim que o Stripe estiver integrado.
+          Métricas em tempo real da Vero.
         </p>
 
         {!metrics ? (
@@ -94,12 +97,33 @@ export default async function AdminOverviewPage() {
 
             <section className="mt-10">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
-                Assinaturas &amp; receita
+                Receita
+              </h2>
+              <div className="mt-3 grid gap-4 sm:grid-cols-3">
+                <MetricCard
+                  label="Recebido"
+                  value={formatPrice(metrics.revenue.totalCents)}
+                  hint={`${metrics.revenue.pagas} sessões pagas`}
+                />
+                <MetricCard
+                  label="Pendente"
+                  value={formatPrice(metrics.revenue.pendentesCents)}
+                  hint="Checkout iniciado, ainda não pago"
+                />
+              </div>
+              <p className="mt-3 text-xs text-ink-soft">
+                Sem Stripe Connect ainda: o valor cai na conta da Vero e o
+                repasse ao profissional é manual (ver Termo de Uso).
+              </p>
+            </section>
+
+            <section className="mt-10">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
+                Assinaturas
               </h2>
               <div className="mt-3 rounded-2xl border border-dashed border-border bg-paper-alt/40 p-6 text-sm text-ink-soft">
-                Ainda não existe cobrança implementada (Stripe). Esta seção
-                vai mostrar MRR, comissão por sessão e assinaturas SaaS ativas
-                assim que essa parte for construída.
+                Planos SaaS mensais pro profissional ainda não existem — hoje
+                a receita é só a comissão por sessão, acima.
               </div>
             </section>
           </>

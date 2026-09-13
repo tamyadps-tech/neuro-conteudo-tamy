@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { sendEmail } from "@/lib/email";
+import { sessionSummaryEmail } from "@/lib/email-templates";
 
 const VALID_STATUSES = new Set([
   "agendada",
@@ -89,6 +91,38 @@ export async function PATCH(
       { error: "Não foi possível salvar agora." },
       { status: 500 }
     );
+  }
+
+  // Ao concluir a sessão, manda o resumo pro cliente. Best-effort: se o
+  // email falhar, a atualização da sessão já valeu de qualquer forma.
+  if (update.status === "concluida") {
+    const { data: fullSession } = await supabase
+      .from("sessions")
+      .select(
+        "topics, homework, next_session_at, professional:professionals(full_name), client:clients(full_name, email, access_token)"
+      )
+      .eq("id", id)
+      .single();
+
+    if (fullSession?.client && fullSession.professional) {
+      const client = fullSession.client as unknown as {
+        full_name: string;
+        email: string;
+        access_token: string;
+      };
+      const professional = fullSession.professional as unknown as {
+        full_name: string;
+      };
+      const { subject, html } = sessionSummaryEmail({
+        clientName: client.full_name,
+        professionalName: professional.full_name,
+        topics: fullSession.topics ?? [],
+        homework: fullSession.homework,
+        nextSessionAt: fullSession.next_session_at,
+        progressUrl: `${new URL(request.url).origin}/c/${client.access_token}`,
+      });
+      await sendEmail({ to: client.email, subject, html });
+    }
   }
 
   return NextResponse.json({ ok: true });
