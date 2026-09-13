@@ -7,6 +7,7 @@ import { ProfessionalCard } from "@/components/ProfessionalCard";
 import { listApprovedProfessionals } from "@/lib/public-professionals";
 import { isProfessionalCategory } from "@/lib/professional-categories";
 import { isSessionFormat } from "@/lib/session-format";
+import { getReviewSummaries, type ReviewSummary } from "@/lib/reviews";
 
 export const metadata: Metadata = {
   title: "Encontre um profissional — Vero",
@@ -29,6 +30,11 @@ export default async function ProfissionaisPage({
     sessionFormat: isSessionFormat(format) ? format : undefined,
     q,
   });
+
+  const ratings = professionals
+    ? await getReviewSummaries(professionals.map((p) => p.id))
+    : null;
+  const emptyRating: ReviewSummary = { average: 0, count: 0 };
 
   return (
     <>
@@ -66,7 +72,11 @@ export default async function ProfissionaisPage({
           ) : (
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {professionals.map((professional) => (
-                <ProfessionalCard key={professional.id} professional={professional} />
+                <ProfessionalCard
+                  key={professional.id}
+                  professional={professional}
+                  rating={ratings?.[professional.id] ?? emptyRating}
+                />
               ))}
             </div>
           )}

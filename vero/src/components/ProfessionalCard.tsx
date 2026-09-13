@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 import { SESSION_FORMAT_LABELS } from "@/lib/session-format";
+import { RatingBadge } from "@/components/RatingBadge";
 import type { PublicProfessional } from "@/lib/public-professionals";
+import type { ReviewSummary } from "@/lib/reviews";
 
 function formatPrice(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", {
@@ -12,8 +14,10 @@ function formatPrice(cents: number) {
 
 export function ProfessionalCard({
   professional,
+  rating,
 }: {
   professional: PublicProfessional;
+  rating: ReviewSummary;
 }) {
   return (
     <Link
@@ -27,6 +31,9 @@ export function ProfessionalCard({
             {CATEGORY_LABELS[professional.category]} ·{" "}
             {professional.years_experience} anos de experiência
           </p>
+          <div className="mt-1">
+            <RatingBadge average={rating.average} count={rating.count} />
+          </div>
         </div>
         <span className="whitespace-nowrap text-sm font-semibold text-primary">
           {formatPrice(professional.price_cents)}

@@ -8,7 +8,8 @@ tom de voz, e [`docs/planning/`](./docs/planning) para o PRD original.
 **Estágio atual**: pré-lançamento, ainda não está no ar. A landing page
 captura interesse na lista de espera; já existem cadastro/vetting de
 profissional, busca/perfil público, agendamento de sessão, prontuário
-compartilhado e progresso sem login. Falta email automático e pagamento.
+compartilhado, progresso sem login e avaliações públicas. Falta email
+automático e pagamento.
 
 ## Stack
 
@@ -70,6 +71,7 @@ src/
       admin/professionals/[id]/     # PATCH aprovar/rejeitar
       admin/.../availability/       # POST/DELETE horários (protegido pelo proxy)
       admin/sessions/[id]/          # PATCH tópicos/tarefa/status da sessão
+      reviews/                      # POST avaliação (rating + comentário)
   components/       # UI da landing page + admin/ (painel)
   lib/              # markdown renderer, cliente Supabase (server-only),
                      # métricas de BI, categorias/formatos compartilhados,
@@ -110,6 +112,10 @@ e2e/              # testes Playwright
 - Ao agendar, o cliente recebe na tela (ainda sem email automático) um link
   pessoal `/c/[token]` — sem login — onde vê a próxima sessão e o histórico
   com tópicos/tarefas de cada sessão passada
+- Nesse mesmo link, depois de uma sessão concluída, o cliente avalia (nota
+  1–5 + comentário opcional). A avaliação aparece pública e anônima no
+  perfil do profissional e como resumo (média + contagem) na busca —
+  "Novo na Vero" honestamente quando ainda não há avaliações
 
 Tudo isso funciona sem quebrar mesmo sem Supabase configurado: as rotas
 respondem 503 com uma mensagem clara em vez de dar erro.
@@ -128,5 +134,6 @@ respondem 503 com uma mensagem clara em vez de dar erro.
    isso só acontece depois que o produto estiver mais construído.
 5. Continuar o marketplace: email automático de confirmação/lembrete/resumo
    de sessão (template já pronto em `docs/email-templates/`, falta o envio
-   de verdade), avaliações públicas, e cobrança (Stripe) — isso também
-   destrava a seção "Assinaturas" do admin.
+   de verdade) e cobrança (Stripe) — isso também destrava a seção
+   "Assinaturas" do admin. Depois disso, o MVP descrito no PRD original
+   está essencialmente completo.

@@ -6,7 +6,9 @@ import { CATEGORY_LABELS } from "@/lib/professional-categories";
 import { SESSION_FORMAT_LABELS } from "@/lib/session-format";
 import { getApprovedProfessional } from "@/lib/public-professionals";
 import { getUpcomingSlotsForProfessional } from "@/lib/booking";
+import { getReviewSummaries, listPublicReviews } from "@/lib/reviews";
 import { BookingWidget } from "@/components/BookingWidget";
+import { RatingBadge } from "@/components/RatingBadge";
 
 function formatPrice(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", {
@@ -60,7 +62,12 @@ export default async function ProfessionalProfilePage({
   }
 
   const professional = lookup.professional;
-  const upcomingSlots = await getUpcomingSlotsForProfessional(id);
+  const [upcomingSlots, ratingSummaries, reviews] = await Promise.all([
+    getUpcomingSlotsForProfessional(id),
+    getReviewSummaries([id]),
+    listPublicReviews(id),
+  ]);
+  const rating = ratingSummaries?.[id] ?? { average: 0, count: 0 };
 
   return (
     <>
@@ -79,6 +86,9 @@ export default async function ProfessionalProfilePage({
             {professional.location_city &&
               ` · ${professional.location_city}/${professional.location_state}`}
           </p>
+          <div className="mt-2">
+            <RatingBadge average={rating.average} count={rating.count} />
+          </div>
 
           {professional.personality && (
             <p className="mt-4 text-lg italic text-ink-soft">
@@ -151,10 +161,36 @@ export default async function ProfessionalProfilePage({
             )}
           </div>
 
-          <p className="mt-4 text-center text-xs text-ink-soft">
-            Ainda não temos avaliações públicas — elas aparecem aqui depois
-            das primeiras sessões.
-          </p>
+          <div className="mt-8">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
+              Avaliações
+            </h2>
+            {reviews === null ? null : reviews.length === 0 ? (
+              <p className="mt-2 text-sm text-ink-soft">
+                Ainda sem avaliações — elas aparecem aqui depois das
+                primeiras sessões.
+              </p>
+            ) : (
+              <div className="mt-3 space-y-3">
+                {reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="rounded-xl border border-border bg-paper-alt/40 p-4"
+                  >
+                    <span className="text-accent" aria-label={`${review.rating} de 5 estrelas`}>
+                      {"★".repeat(review.rating)}
+                      {"☆".repeat(5 - review.rating)}
+                    </span>
+                    {review.comment && (
+                      <p className="mt-1 text-sm text-ink-soft">
+                        &ldquo;{review.comment}&rdquo;
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </article>
       </main>
       <Footer />

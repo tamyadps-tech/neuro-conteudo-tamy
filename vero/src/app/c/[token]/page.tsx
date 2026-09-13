@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getClientProgress } from "@/lib/client-progress";
+import { ReviewForm } from "@/components/ReviewForm";
 
 export const metadata: Metadata = {
   title: "Seu progresso — Vero",
@@ -158,6 +159,20 @@ export default async function ClientProgressPage({
                       <p className="mt-1 text-sm text-ink">{session.homework}</p>
                     </div>
                   )}
+
+                  {session.status === "concluida" &&
+                    (session.review ? (
+                      <p className="mt-3 text-sm text-ink-soft">
+                        Sua avaliação:{" "}
+                        <span className="text-accent">
+                          {"★".repeat(session.review.rating)}
+                          {"☆".repeat(5 - session.review.rating)}
+                        </span>
+                        {session.review.comment && ` — "${session.review.comment}"`}
+                      </p>
+                    ) : (
+                      <ReviewForm token={token} sessionId={session.id} />
+                    ))}
                 </div>
               ))}
             </div>

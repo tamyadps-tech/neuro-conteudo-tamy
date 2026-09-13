@@ -11,6 +11,7 @@ export interface ClientProgressSession {
   homework: string | null;
   next_session_at: string | null;
   professional: { full_name: string } | null;
+  review: { rating: number; comment: string | null } | null;
 }
 
 export interface ClientProgress {
@@ -47,7 +48,7 @@ export async function getClientProgress(token: string): Promise<ClientLookup> {
   const { data: sessions, error: sessionsError } = await supabase
     .from("sessions")
     .select(
-      "id, scheduled_at, status, topics, homework, next_session_at, professional:professionals(full_name)"
+      "id, scheduled_at, status, topics, homework, next_session_at, professional:professionals(full_name), review:reviews(rating, comment)"
     )
     .eq("client_id", client.id)
     .order("scheduled_at", { ascending: false });
