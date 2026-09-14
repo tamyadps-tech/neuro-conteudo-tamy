@@ -168,36 +168,40 @@ export async function POST(request: Request) {
   }
 
   const { data } = result;
-  const { error } = await supabase.from("professionals").insert({
-    full_name: data.fullName,
-    email: data.email,
-    category: data.category,
-    bio: data.bio,
-    years_experience: data.yearsExperience,
-    specialties: data.specialties,
-    methods: data.methods,
-    personality: data.personality ?? null,
-    session_format: data.sessionFormat,
-    location_city: data.locationCity ?? null,
-    location_state: data.locationState ?? null,
-    location_address: data.locationAddress ?? null,
-    price_cents: data.priceCents,
-    credential_document_url: data.credentialDocumentUrl ?? null,
-  });
+  const { data: inserted, error } = await supabase
+    .from("professionals")
+    .insert({
+      full_name: data.fullName,
+      email: data.email,
+      category: data.category,
+      bio: data.bio,
+      years_experience: data.yearsExperience,
+      specialties: data.specialties,
+      methods: data.methods,
+      personality: data.personality ?? null,
+      session_format: data.sessionFormat,
+      location_city: data.locationCity ?? null,
+      location_state: data.locationState ?? null,
+      location_address: data.locationAddress ?? null,
+      price_cents: data.priceCents,
+      credential_document_url: data.credentialDocumentUrl ?? null,
+    })
+    .select("access_token")
+    .single();
 
-  if (error) {
-    if (error.code === "23505") {
+  if (error || !inserted) {
+    if (error?.code === "23505") {
       return NextResponse.json(
         { error: "Já existe uma candidatura com esse email." },
         { status: 409 }
       );
     }
-    console.error("[professionals/apply] Supabase insert failed:", error.message);
+    console.error("[professionals/apply] Supabase insert failed:", error?.message);
     return NextResponse.json(
       { error: "Não foi possível enviar agora. Tente novamente." },
       { status: 500 }
     );
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, dashboardToken: inserted.access_token });
 }

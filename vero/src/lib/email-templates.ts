@@ -124,3 +124,56 @@ export function sessionSummaryEmail({
     html: shell("Resumo da sessão — Vero", body),
   };
 }
+
+export function professionalApprovedEmail({
+  professionalName,
+  dashboardUrl,
+}: {
+  professionalName: string;
+  dashboardUrl: string;
+}): { subject: string; html: string } {
+  const body = `
+    <p style="font-size:16px;">Olá, <strong>${escapeHtml(professionalName)}</strong>,</p>
+    <p style="font-size:14px;line-height:1.6;color:#5b6763;">
+      Boas notícias: sua candidatura foi <strong>aprovada</strong> e seu
+      perfil já está visível na Vero.
+    </p>
+    <p style="font-size:14px;line-height:1.6;color:#5b6763;">
+      Use o link abaixo pra configurar sua disponibilidade e acompanhar
+      suas sessões — sem senha, guarde-o num lugar seguro.
+    </p>
+    <p style="margin:24px 0;">${button(dashboardUrl, "Acessar meu painel")}</p>
+  `;
+  return {
+    subject: "Sua candidatura foi aprovada — Vero",
+    html: shell("Candidatura aprovada — Vero", body),
+  };
+}
+
+export function professionalRejectedEmail({
+  professionalName,
+  notes,
+}: {
+  professionalName: string;
+  notes: string | null;
+}): { subject: string; html: string } {
+  const notesHtml = notes
+    ? `<p style="font-size:14px;line-height:1.6;color:#5b6763;"><strong>Observação:</strong> ${escapeHtml(notes)}</p>`
+    : "";
+  const body = `
+    <p style="font-size:16px;">Olá, <strong>${escapeHtml(professionalName)}</strong>,</p>
+    <p style="font-size:14px;line-height:1.6;color:#5b6763;">
+      Depois de revisar sua candidatura, não conseguimos aprová-la nesta
+      etapa do vetting da Vero.
+    </p>
+    ${notesHtml}
+    <p style="font-size:14px;line-height:1.6;color:#5b6763;">
+      Dúvidas? Responda este email ou escreva pra
+      <a href="mailto:suporte@vero.app" style="color:#0f6e64;">suporte@vero.app</a>.
+    </p>
+  `;
+  return {
+    subject: "Sobre sua candidatura — Vero",
+    html: shell("Sobre sua candidatura — Vero", body),
+  };
+}

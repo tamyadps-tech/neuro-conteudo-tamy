@@ -85,9 +85,12 @@ src/
                               # com o widget de agendamento
     profissionais/cadastro/   # formulário público de candidatura
     admin/                    # visão geral (BI), fila de vetting,
-                              # detalhe do profissional (disponibilidade +
-                              # prontuário das sessões), assinaturas (placeholder)
+                              # detalhe do profissional (referência/suporte),
+                              # assinaturas (placeholder)
     c/[token]/                # progresso do cliente, sem login (link único)
+    p/[token]/                 # painel do profissional, sem login (link único):
+                              # agenda, prontuário, CRM de clientes,
+                              # financeiro e divulgação (link do perfil público)
     api/
       waitlist/                    # POST lista de espera
       professionals/apply/         # POST candidatura de profissional
@@ -95,16 +98,22 @@ src/
       admin/professionals/[id]/     # PATCH aprovar/rejeitar
       admin/.../availability/       # POST/DELETE horários (protegido pelo proxy)
       admin/sessions/[id]/          # PATCH tópicos/tarefa/status da sessão
+      professional/availability/    # POST/DELETE horários (auth por token, sem senha)
+      professional/sessions/[id]/   # PATCH tópicos/tarefa/status (auth por token)
       reviews/                      # POST avaliação (rating + comentário)
       assessments/submit/           # POST autoavaliação (PHQ-9, GAD-7, Roda da Vida)
       stripe/webhook/               # confirma pagamento (checkout.session.completed)
-  components/       # UI da landing page + admin/ (painel)
+  components/       # UI da landing page + admin/ (painel) + professional/
+                     # (painel do profissional)
   lib/              # markdown renderer, cliente Supabase (server-only),
                      # métricas de BI, categorias/formatos compartilhados,
                      # cálculo de horários disponíveis (availability.ts,
                      # puro e testado isoladamente), email.ts (Resend),
                      # email-templates.ts, stripe.ts, assessments.ts
-                     # (PHQ-9/GAD-7/Roda da Vida, scoring puro e testado)
+                     # (PHQ-9/GAD-7/Roda da Vida, scoring puro e testado),
+                     # professional-auth.ts (resolve token -> profissional,
+                     # nunca confia em id vindo do corpo da requisição),
+                     # professional-clients.ts (CRM), professional-finance.ts
   proxy.ts          # HTTP Basic Auth em /admin e /api/admin (Next 16 "proxy")
 docs/
   legal/          # Termo de Uso e Política de Privacidade (fonte .md)
@@ -113,7 +122,8 @@ docs/
   planning/       # PRD original (sumário executivo, resumo do projeto)
 supabase/
   migrations/     # schema SQL: waitlist + entidades do marketplace + pagamentos
-                  # + autoavaliações — já aplicado no projeto real
+                  # + autoavaliações + access_token do profissional — já
+                  # aplicado no projeto real
 e2e/              # testes Playwright
 ```
 
@@ -132,14 +142,19 @@ e2e/              # testes Playwright
   sessão que já funciona
 - Cliente busca profissionais aprovados em `/profissionais` (filtro por
   categoria, formato, texto) e vê o perfil público em `/profissionais/[id]`
-- Vocês cadastram a disponibilidade semanal recorrente de cada profissional
-  em `/admin/profissionais/[id]` (sem dashboard de profissional ainda);
-  cliente escolhe um horário no perfil público, preenche nome/email e
-  agenda. O servidor sempre recalcula a disponibilidade de verdade antes de
-  confirmar, pra evitar duplo agendamento
-- Depois da sessão, vocês registram tópicos abordados, tarefa e próxima
-  sessão em `/admin/profissionais/[id]` (o "prontuário" — sem dashboard de
-  profissional ainda, é manual)
+- Ao ser aprovado, o profissional recebe por email um link pessoal
+  `/p/[token]` — sem login — onde administra o próprio negócio na Vero:
+  cadastra a disponibilidade semanal recorrente, registra o prontuário de
+  cada sessão (tópicos, tarefa, próxima sessão), vê a lista dos próprios
+  clientes com histórico e valor pago (CRM básico), acompanha o financeiro
+  (recebido/pendente por sessão) e tem o link do próprio perfil público
+  pronto pra divulgar. Cliente escolhe um horário no perfil público,
+  preenche nome/email e agenda; o servidor sempre recalcula a
+  disponibilidade de verdade antes de confirmar, pra evitar duplo
+  agendamento
+- O admin também vê disponibilidade e prontuário em
+  `/admin/profissionais/[id]` (referência/suporte da equipe — o
+  profissional aprovado já gerencia isso pelo próprio painel)
 - Ao agendar, o cliente recebe na tela (e por email, se o Resend estiver
   configurado) um link pessoal `/c/[token]` — sem login — onde vê a
   próxima sessão e o histórico com tópicos/tarefas de cada sessão passada
@@ -176,9 +191,7 @@ Hoje (com Supabase, Resend e Stripe configurados) só falta mesmo o
    `[a definir]` (razão social, CNPJ, telefone) e precisam de revisão por
    advogado especializado em LGPD antes de publicar de verdade.
 3. **Login de verdade no admin**: trocar o Basic Auth por Supabase Auth
-   assim que mais de vocês dois precisar de acesso — isso também abre
-   caminho pra um dashboard de profissional de verdade (hoje disponibilidade
-   e prontuário são geridos manualmente pelo admin).
+   assim que mais de vocês dois precisar de acesso.
 4. Repasse aos profissionais ainda é manual (a Vero recebe 100% via Stripe,
    sem Stripe Connect); automatizar isso é um passo futuro, não deste MVP.
 5. Lembrete de sessão 24h antes precisa de um agendador (cron) — só faz

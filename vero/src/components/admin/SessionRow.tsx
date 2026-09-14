@@ -43,7 +43,14 @@ function toDatetimeLocal(iso: string | null): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export function SessionRow({ session }: { session: AdminSession }) {
+export function SessionRow({
+  session,
+  token,
+}: {
+  session: AdminSession;
+  /** Presente no painel do profissional (/p/[token]); ausente no admin. */
+  token?: string;
+}) {
   const router = useRouter();
   const [topics, setTopics] = useState(session.topics?.join(", ") ?? "");
   const [homework, setHomework] = useState(session.homework ?? "");
@@ -60,10 +67,14 @@ export function SessionRow({ session }: { session: AdminSession }) {
     setError("");
     setSaved(false);
     try {
-      const response = await fetch(`/api/admin/sessions/${session.id}`, {
+      const endpoint = token
+        ? `/api/professional/sessions/${session.id}`
+        : `/api/admin/sessions/${session.id}`;
+      const response = await fetch(endpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          token,
           topics: parseTagList(topics),
           homework,
           nextSessionAt: nextSessionAt ? new Date(nextSessionAt).toISOString() : null,

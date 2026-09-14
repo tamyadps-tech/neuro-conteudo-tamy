@@ -8,9 +8,12 @@ import type { AdminAvailabilitySlot } from "@/lib/booking";
 export function AvailabilityManager({
   professionalId,
   slots,
+  token,
 }: {
   professionalId: string;
   slots: AdminAvailabilitySlot[];
+  /** Presente no painel do profissional (/p/[token]); ausente no admin. */
+  token?: string;
 }) {
   const router = useRouter();
   const [weekday, setWeekday] = useState("1");
@@ -22,14 +25,17 @@ export function AvailabilityManager({
     setPending(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/admin/professionals/${professionalId}/availability`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ weekday: Number(weekday), startTime }),
-        }
-      );
+      const response = token
+        ? await fetch(`/api/professional/availability`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, weekday: Number(weekday), startTime }),
+          })
+        : await fetch(`/api/admin/professionals/${professionalId}/availability`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ weekday: Number(weekday), startTime }),
+          });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error ?? "Não foi possível salvar agora.");
@@ -46,10 +52,16 @@ export function AvailabilityManager({
     setPending(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/admin/professionals/${professionalId}/availability/${slotId}`,
-        { method: "DELETE" }
-      );
+      const response = token
+        ? await fetch(`/api/professional/availability/${slotId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+          })
+        : await fetch(
+            `/api/admin/professionals/${professionalId}/availability/${slotId}`,
+            { method: "DELETE" }
+          );
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error ?? "Não foi possível remover agora.");

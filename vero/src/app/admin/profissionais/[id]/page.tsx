@@ -47,13 +47,24 @@ export default async function AdminProfessionalDetailPage({
           {SESSION_FORMAT_LABELS[professional.session_format]}
         </p>
 
+        {professional.vetting_status === "aprovado" && (
+          <div className="mt-4 rounded-xl border border-border bg-paper-alt/40 px-4 py-3 text-sm">
+            <p className="text-ink-soft">
+              Painel próprio do profissional (agenda, prontuário, clientes e
+              financeiro):{" "}
+              <code className="text-ink">/p/{professional.access_token}</code>
+            </p>
+          </div>
+        )}
+
         <section className="mt-10">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
             Disponibilidade semanal
           </h2>
           <p className="mt-1 text-sm text-ink-soft">
-            Sem dashboard de profissional ainda, quem cadastra os horários é
-            a equipe. Cada horário se repete toda semana até ser removido.
+            O profissional aprovado já gerencia isso pelo próprio painel
+            (link acima). O que estiver aqui é só pra referência/suporte da
+            equipe.
           </p>
           <div className="mt-4 rounded-2xl border border-border bg-paper-alt/40 p-5">
             {slots === null ? (
@@ -71,9 +82,9 @@ export default async function AdminProfessionalDetailPage({
             Sessões e prontuário
           </h2>
           <p className="mt-1 text-sm text-ink-soft">
-            Sem dashboard de profissional ainda, o registro de cada sessão
-            (tópicos, tarefa, próxima sessão) também é feito pela equipe. O
-            cliente vê isso no próprio link de progresso.
+            O profissional aprovado já registra tópicos, tarefa e próxima
+            sessão pelo próprio painel. O cliente vê isso no link de
+            progresso dele.
           </p>
           <div className="mt-4 space-y-3">
             {sessions === null ? (

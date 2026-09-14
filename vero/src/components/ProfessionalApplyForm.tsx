@@ -36,6 +36,7 @@ export function ProfessionalApplyForm() {
   const [credentialUrl, setCredentialUrl] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const [dashboardToken, setDashboardToken] = useState<string | null>(null);
 
   const needsLocation = sessionFormat !== "online";
 
@@ -73,9 +74,10 @@ export function ProfessionalApplyForm() {
         throw new Error(data.error ?? "Não foi possível enviar agora.");
       }
 
+      setDashboardToken(data.dashboardToken ?? null);
       setStatus("success");
       setMessage(
-        "Candidatura recebida! Vamos verificar suas credenciais e avisar por email em até 7 dias úteis."
+        "Candidatura recebida! Vamos verificar suas credenciais e avisar em até 7 dias úteis."
       );
     } catch (error) {
       setStatus("error");
@@ -91,6 +93,21 @@ export function ProfessionalApplyForm() {
     return (
       <div className="rounded-2xl border border-primary/30 bg-primary-light px-6 py-5 text-center">
         <p className="font-medium text-primary-dark">{message}</p>
+        {dashboardToken && (
+          <>
+            <p className="mt-3 text-sm text-primary-dark">
+              Guarde este link — é dele que você acompanha o status da
+              candidatura e, depois de aprovado(a), gerencia sua agenda e
+              suas sessões, sem precisar de senha:
+            </p>
+            <a
+              href={`/p/${dashboardToken}`}
+              className="mt-2 inline-block break-all text-sm font-medium text-primary-dark underline"
+            >
+              /p/{dashboardToken}
+            </a>
+          </>
+        )}
       </div>
     );
   }

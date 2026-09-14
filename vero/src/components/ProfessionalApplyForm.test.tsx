@@ -16,7 +16,7 @@ describe("ProfessionalApplyForm", () => {
     const fetchMock = fetch as unknown as ReturnType<typeof vi.fn>;
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ ok: true }),
+      json: async () => ({ ok: true, dashboardToken: "token-abc" }),
     });
 
     const user = userEvent.setup();
@@ -38,6 +38,10 @@ describe("ProfessionalApplyForm", () => {
 
     await waitFor(() =>
       expect(screen.getByText(/candidatura recebida/i)).toBeInTheDocument()
+    );
+    expect(screen.getByRole("link", { name: /token-abc/ })).toHaveAttribute(
+      "href",
+      "/p/token-abc"
     );
 
     const [, options] = fetchMock.mock.calls[0];
