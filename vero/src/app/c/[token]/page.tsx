@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getClientProgress } from "@/lib/client-progress";
 import { ReviewForm } from "@/components/ReviewForm";
+import { AssessmentsSection } from "@/components/AssessmentsSection";
 
 export const metadata: Metadata = {
   title: "Seu progresso — Vero",
@@ -114,6 +115,16 @@ export default async function ClientProgressPage({
               )}
             </div>
           )}
+
+          <h2 className="mt-10 text-sm font-semibold uppercase tracking-wide text-ink-soft">
+            Autoavaliações
+          </h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Faça periodicamente pra acompanhar sua evolução ao longo do tempo.
+          </p>
+          <div className="mt-4">
+            <AssessmentsSection token={token} responses={client.assessmentResponses} />
+          </div>
 
           <h2 className="mt-10 text-sm font-semibold uppercase tracking-wide text-ink-soft">
             Histórico de sessões

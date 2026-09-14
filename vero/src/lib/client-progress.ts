@@ -14,9 +14,18 @@ export interface ClientProgressSession {
   review: { rating: number; comment: string | null } | null;
 }
 
+export interface ClientAssessmentResponse {
+  id: string;
+  template_slug: string;
+  score: number;
+  severity: string;
+  created_at: string;
+}
+
 export interface ClientProgress {
   full_name: string;
   sessions: ClientProgressSession[];
+  assessmentResponses: ClientAssessmentResponse[];
 }
 
 type ClientLookup =
@@ -57,11 +66,25 @@ export async function getClientProgress(token: string): Promise<ClientLookup> {
     console.error("[client-progress] Failed to load sessions:", sessionsError.message);
   }
 
+  const { data: assessmentResponses, error: assessmentsError } = await supabase
+    .from("assessment_responses")
+    .select("id, template_slug, score, severity, created_at")
+    .eq("client_id", client.id)
+    .order("created_at", { ascending: false });
+
+  if (assessmentsError) {
+    console.error(
+      "[client-progress] Failed to load assessment responses:",
+      assessmentsError.message
+    );
+  }
+
   return {
     configured: true,
     client: {
       full_name: client.full_name,
       sessions: (sessions ?? []) as unknown as ClientProgressSession[],
+      assessmentResponses: assessmentResponses ?? [],
     },
   };
 }

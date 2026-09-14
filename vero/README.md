@@ -5,12 +5,15 @@ palestrantes — com vetting de credenciais, avaliações públicas e progresso
 visual sem login. Ver [`BRANDING.md`](./BRANDING.md) para nome, cores e
 tom de voz, e [`docs/planning/`](./docs/planning) para o PRD original.
 
-**Estágio atual**: pré-lançamento, ainda não está no ar. A landing page
-captura interesse na lista de espera; já existem cadastro/vetting de
-profissional, busca/perfil público, agendamento de sessão, prontuário
-compartilhado, progresso sem login, avaliações públicas, email
-transacional e cobrança via Stripe — todos com fallback gracioso: sem as
-chaves configuradas, o app funciona igual, só no "modo grátis/sem email".
+**Estágio atual**: pré-lançamento — o produto está funcionalmente completo
+e conectado a serviços reais (Supabase, Resend, Stripe em modo teste), mas
+ainda não está publicado em nenhum domínio. A landing page captura
+interesse na lista de espera; já existem cadastro/vetting de profissional,
+busca/perfil público, agendamento de sessão, prontuário compartilhado,
+progresso sem login, autoavaliações (PHQ-9, GAD-7, Roda da Vida),
+avaliações públicas, email transacional e cobrança via Stripe — todos com
+fallback gracioso: sem alguma chave configurada, essa parte específica
+cai pro "modo grátis/sem email" em vez de quebrar.
 
 ## Stack
 
@@ -20,7 +23,8 @@ enquanto o projeto valida demanda:
 - **Next.js 16** (App Router) + **TypeScript** + **Tailwind CSS v4** — código
   próprio para o núcleo do produto (marketplace, perfis, dashboard)
 - **Supabase** (Postgres) para dados — schema em [`supabase/migrations`](./supabase/migrations),
-  ainda não aplicado a um projeto real (ver "Próximos passos")
+  já aplicado no projeto real (organização "tamyadps-tech's Projects" na
+  Supabase)
 - Serviços prontos só onde é essencial e barato: **Stripe Checkout** para
   pagamento (sem Stripe Connect ainda — o repasse ao profissional é manual)
   e **Resend** para email transacional (camada gratuita, 100/dia)
@@ -34,28 +38,33 @@ npm run dev
 
 Abre em [http://localhost:3000](http://localhost:3000).
 
-Copie `.env.example` para `.env.local` e preencha:
+Copie `.env.example` para `.env.local` e preencha (ver o arquivo pra
+instruções detalhadas de cada uma):
 
-- `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — de um projeto Supabase com
-  as migrations de `supabase/migrations/` aplicadas. Sem isso, a lista de
-  espera e o cadastro de profissional respondem 503 em vez de gravar.
+- `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — **já configurados e
+  testados** no projeto real (peça as credenciais salvas, não estão no
+  repo). Sem isso, a lista de espera e o cadastro de profissional
+  respondem 503 em vez de gravar.
 - `ADMIN_USER` / `ADMIN_PASSWORD` — credenciais de HTTP Basic Auth pra
-  acessar `/admin` (visão geral, fila de vetting). Sem isso, `/admin`
-  responde 503. É proteção mínima pra "só vocês dois" — trocar por login de
-  verdade (Supabase Auth) antes de dar acesso a mais gente.
-- `RESEND_API_KEY` / `RESEND_FROM` — pra emails de confirmação e resumo de
-  sessão saírem de verdade. Sem isso, o app só loga um aviso e segue —
-  ninguém recebe email, mas nada quebra. Conta grátis em
-  [resend.com](https://resend.com).
-- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` — pra cobrar a sessão via
-  Stripe Checkout. Sem isso, o agendamento continua de graça (não cobra
-  nada). Conta grátis em [stripe.com](https://stripe.com) — comece com as
-  chaves de **teste** (`sk_test_...`); ver comentários no `.env.example`
-  para o passo a passo do webhook.
+  acessar `/admin`. **Já configurado** — pedir a senha salva. Proteção
+  mínima pra "só vocês dois" — trocar por login de verdade (Supabase Auth)
+  antes de dar acesso a mais gente.
+- `RESEND_API_KEY` / `RESEND_FROM` — **já configurado** (chave real, ainda
+  usando o domínio de teste da Resend — só entrega pro próprio email
+  cadastrado lá até verificar um domínio próprio). Sem isso, o app só
+  loga um aviso e segue — ninguém recebe email, mas nada quebra.
+- `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` — **já configurados**
+  (chaves de **teste**, `sk_test_...`/`pk_test_...`). Sem isso, o
+  agendamento continua de graça (não cobra nada).
+- `STRIPE_WEBHOOK_SECRET` — **ainda pendente**: precisa de uma URL pública
+  (Developers → Webhooks no painel Stripe, apontando pra
+  `<seu-domínio>/api/stripe/webhook`) — só dá pra configurar depois do
+  deploy.
 
-Nenhuma dessas contas (Supabase, Resend, Stripe) é algo que eu crie por
-vocês — precisam ser criadas por vocês mesmos, com os dados reais do
-negócio. O código já está pronto pra usar assim que as chaves existirem.
+As contas (Supabase, Resend, Stripe) foram criadas por vocês — eu não
+crio contas de terceiros. O código já está plugado e testado (o Supabase
+foi validado com insert/delete reais via MCP); só falta publicar em
+algum lugar pra testar o fluxo completo clicando no site.
 
 ## Testes
 
@@ -87,13 +96,15 @@ src/
       admin/.../availability/       # POST/DELETE horários (protegido pelo proxy)
       admin/sessions/[id]/          # PATCH tópicos/tarefa/status da sessão
       reviews/                      # POST avaliação (rating + comentário)
+      assessments/submit/           # POST autoavaliação (PHQ-9, GAD-7, Roda da Vida)
       stripe/webhook/               # confirma pagamento (checkout.session.completed)
   components/       # UI da landing page + admin/ (painel)
   lib/              # markdown renderer, cliente Supabase (server-only),
                      # métricas de BI, categorias/formatos compartilhados,
                      # cálculo de horários disponíveis (availability.ts,
                      # puro e testado isoladamente), email.ts (Resend),
-                     # email-templates.ts, stripe.ts
+                     # email-templates.ts, stripe.ts, assessments.ts
+                     # (PHQ-9/GAD-7/Roda da Vida, scoring puro e testado)
   proxy.ts          # HTTP Basic Auth em /admin e /api/admin (Next 16 "proxy")
 docs/
   legal/          # Termo de Uso e Política de Privacidade (fonte .md)
@@ -102,6 +113,7 @@ docs/
   planning/       # PRD original (sumário executivo, resumo do projeto)
 supabase/
   migrations/     # schema SQL: waitlist + entidades do marketplace + pagamentos
+                  # + autoavaliações — já aplicado no projeto real
 e2e/              # testes Playwright
 ```
 
@@ -142,30 +154,36 @@ e2e/              # testes Playwright
   graça — nada trava por falta da chave
 - Quando o admin marca uma sessão como concluída (com tópicos/tarefa
   preenchidos), o cliente recebe o resumo por email automaticamente
+- No link de progresso, o cliente também pode fazer autoavaliações
+  (PHQ-9, GAD-7, Roda da Vida) quando quiser, e ver o histórico de scores
+  ao longo do tempo — só instrumentos de domínio público ou de autoria
+  própria por enquanto, os demais do PRD original (DASS-21, Rosenberg
+  etc.) ficam de fora até verificar licenciamento
 
-Tudo isso funciona sem quebrar mesmo sem Supabase/Resend/Stripe
-configurados: as rotas respondem 503 ou seguem em modo grátis/sem email,
-nunca com erro.
+Tudo isso funciona sem quebrar mesmo sem alguma das chaves configurada:
+as rotas respondem 503 ou seguem em modo grátis/sem email, nunca com erro.
+Hoje (com Supabase, Resend e Stripe configurados) só falta mesmo o
+`STRIPE_WEBHOOK_SECRET` e o deploy.
 
 ## Próximos passos
 
-1. **Revisão jurídica**: os documentos em `docs/legal/` têm campos
+1. **Deploy**: publicar num host real (Vercel é o mais natural pro
+   Next.js, tem tier gratuito) com as mesmas variáveis de ambiente do
+   `.env.local`. Só depois disso dá pra testar o fluxo inteiro clicando
+   no site (agendar → pagar → receber email) e configurar o
+   `STRIPE_WEBHOOK_SECRET`.
+2. **Revisão jurídica**: os documentos em `docs/legal/` têm campos
    `[a definir]` (razão social, CNPJ, telefone) e precisam de revisão por
    advogado especializado em LGPD antes de publicar de verdade.
-2. **Provisionar Supabase**: criar o projeto real e aplicar as migrations
-   em `supabase/migrations/` (isso tem passo de aprovação separado, por
-   envolver criar um recurso de conta — perguntar antes de criar).
 3. **Login de verdade no admin**: trocar o Basic Auth por Supabase Auth
-   assim que mais de vocês dois precisar de acesso.
-4. **Domínio e deploy**: registrar domínio e colocar no ar — combinado que
-   isso só acontece depois que o produto estiver mais construído.
-5. **Ativar Resend e Stripe**: criar as contas (gratuitas para começar) e
-   preencher as chaves no `.env.local`/nas variáveis de ambiente do deploy
-   — ver `.env.example`. Sem isso o app funciona, só não manda email nem
-   cobra.
-6. Repasse aos profissionais ainda é manual (a Vero recebe 100% via Stripe,
+   assim que mais de vocês dois precisar de acesso — isso também abre
+   caminho pra um dashboard de profissional de verdade (hoje disponibilidade
+   e prontuário são geridos manualmente pelo admin).
+4. Repasse aos profissionais ainda é manual (a Vero recebe 100% via Stripe,
    sem Stripe Connect); automatizar isso é um passo futuro, não deste MVP.
-7. Lembrete de sessão 24h antes precisa de um agendador (cron) — só faz
+5. Lembrete de sessão 24h antes precisa de um agendador (cron) — só faz
    sentido configurar depois que o app estiver de fato no ar.
-8. Com Resend e Stripe ativados, o MVP descrito no PRD original está
-   essencialmente completo.
+6. Domínio de email verificado na Resend (hoje usa o domínio de teste
+   deles, que só entrega pro próprio email cadastrado lá).
+7. Mais autoavaliações (DASS-21, Rosenberg, etc.) — verificar licenciamento
+   antes de adicionar.

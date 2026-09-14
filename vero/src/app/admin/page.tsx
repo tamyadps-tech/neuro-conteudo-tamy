@@ -3,6 +3,10 @@ import { MetricCard } from "@/components/admin/MetricCard";
 import { getAdminMetrics } from "@/lib/admin-metrics";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 
+// Dados de admin precisam ser sempre frescos — nunca cacheados como página
+// estática no build (senão o painel mostraria número congelado).
+export const dynamic = "force-dynamic";
+
 function formatPrice(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }

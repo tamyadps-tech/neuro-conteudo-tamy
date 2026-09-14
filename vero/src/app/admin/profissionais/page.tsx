@@ -2,6 +2,10 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import { ProfessionalRow } from "@/components/admin/ProfessionalRow";
 import { listProfessionals } from "@/lib/admin-professionals";
 
+// Fila de vetting precisa ser sempre fresca — nunca cacheada como página
+// estática no build.
+export const dynamic = "force-dynamic";
+
 export default async function AdminProfessionalsPage() {
   const professionals = await listProfessionals();
 
