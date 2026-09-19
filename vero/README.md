@@ -174,6 +174,16 @@ e2e/              # testes Playwright
   ao longo do tempo — só instrumentos de domínio público ou de autoria
   própria por enquanto, os demais do PRD original (DASS-21, Rosenberg
   etc.) ficam de fora até verificar licenciamento
+- Em `/admin/marketing` (aba pra divulgar a própria Vero, não o negócio de
+  um profissional específico), vocês têm: modelos prontos de campanha —
+  convite (venda), acompanhamento e pós-venda com cuidado — em versão
+  email e WhatsApp; a plataforma recomendada pra cada canal (Brevo pra
+  email marketing, Zenvia pra WhatsApp em massa, com alternativas
+  explicadas); botão de copiar cada modelo; e disparo de campanha de
+  verdade pra segmentos já existentes (lista de espera por papel,
+  profissionais aprovados) ou pra uma lista manual de emails/números. Sem
+  `BREVO_API_KEY`/`ZENVIA_API_TOKEN` configurados, o disparo roda normal
+  mas mostra "não enviado" — mesmo padrão de fallback do resto do app
 
 Tudo isso funciona sem quebrar mesmo sem alguma das chaves configurada:
 as rotas respondem 503 ou seguem em modo grátis/sem email, nunca com erro.

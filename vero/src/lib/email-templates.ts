@@ -12,7 +12,7 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   timeStyle: "short",
 });
 
-function shell(title: string, bodyHtml: string): string {
+export function shell(title: string, bodyHtml: string): string {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${escapeHtml(title)}</title></head>
@@ -34,7 +34,7 @@ function shell(title: string, bodyHtml: string): string {
 </html>`;
 }
 
-function button(href: string, label: string): string {
+export function button(href: string, label: string): string {
   return `<a href="${escapeHtml(href)}" style="display:inline-block;background:#0f6e64;color:#fbf8f3;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">${escapeHtml(label)}</a>`;
 }
 
