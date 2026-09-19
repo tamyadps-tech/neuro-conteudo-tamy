@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { AvailabilityManager } from "@/components/admin/AvailabilityManager";
 import { SessionRow } from "@/components/admin/SessionRow";
 import { ShareProfileLink } from "@/components/professional/ShareProfileLink";
+import { ProfessionalMarketingComposer } from "@/components/professional/ProfessionalMarketingComposer";
 import { RatingBadge } from "@/components/RatingBadge";
 import { getProfessionalByToken } from "@/lib/professional-auth";
 import { listAvailabilitySlots } from "@/lib/booking";
@@ -12,6 +13,7 @@ import { listSessionsForProfessional } from "@/lib/admin-sessions";
 import { listProfessionalClients } from "@/lib/professional-clients";
 import { getProfessionalFinance } from "@/lib/professional-finance";
 import { getReviewSummaries } from "@/lib/reviews";
+import { resolveProfessionalCampaignTemplates } from "@/lib/professional-campaign-templates";
 import { CATEGORY_LABELS } from "@/lib/professional-categories";
 import { SESSION_FORMAT_LABELS } from "@/lib/session-format";
 
@@ -105,6 +107,10 @@ export default async function ProfessionalDashboardPage({
   const origin = `${headersList.get("x-forwarded-proto") ?? "https"}://${headersList.get("host") ?? "vero.app"}`;
   const publicProfileUrl = `${origin}/profissionais/${professional.id}`;
   const rating = reviewSummaries?.[professional.id] ?? { average: 0, count: 0 };
+  const campaignTemplates = resolveProfessionalCampaignTemplates(
+    professional.full_name,
+    publicProfileUrl
+  );
 
   return (
     <>
@@ -239,6 +245,65 @@ export default async function ProfessionalDashboardPage({
                     </div>
                   ))}
                 </div>
+              )}
+            </div>
+          </section>
+
+          {/* Marketing */}
+          <section className="mt-10">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-soft">
+              Marketing
+            </h2>
+            <p className="mt-1 text-sm text-ink-soft">
+              Mande campanha de email ou WhatsApp direto daqui, sem precisar abrir
+              nenhuma outra plataforma — a Vero cuida do envio.
+            </p>
+
+            <div className="mt-4 rounded-2xl border border-dashed border-border bg-paper-alt/40 p-5 text-sm text-ink-soft">
+              <p className="font-medium text-ink">Como funciona</p>
+              <ol className="mt-2 list-decimal space-y-1 pl-5">
+                <li>Escolha um modelo pronto (dá pra usar do jeito que está).</li>
+                <li>
+                  Pra email, marque quem da sua lista de clientes vai receber. Pra
+                  WhatsApp, cole os números de quem já topou receber mensagem sua.
+                </li>
+                <li>Confira a prévia e clique em enviar — sai na hora, direto da Vero.</li>
+              </ol>
+              <p className="mt-3 font-medium text-ink">Dicas de sucesso</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>
+                  Personalize a mensagem antes de enviar — um toque pessoal aumenta
+                  muito a resposta.
+                </li>
+                <li>
+                  Não exagere na frequência: 1 mensagem de cuidado por mês pros
+                  clientes ativos, e reengajamento só pra quem sumiu de verdade.
+                </li>
+                <li>
+                  No WhatsApp, mande só pra quem já é seu cliente e autorizou receber
+                  mensagem — é o jeito certo de respeitar a LGPD e evitar bloqueio.
+                </li>
+                <li>Escolha um bom horário: fim de manhã ou fim de tarde costuma ter mais retorno.</li>
+                <li>
+                  Depois de mandar, acompanhe aqui mesmo quem volta a agendar — é o
+                  sinal de que funcionou.
+                </li>
+              </ul>
+            </div>
+
+            <div className="mt-4">
+              {clients === null ? (
+                <p className="text-sm text-ink-soft">Supabase ainda não está configurado.</p>
+              ) : (
+                <ProfessionalMarketingComposer
+                  token={token}
+                  templates={campaignTemplates}
+                  clients={clients.map((client) => ({
+                    id: client.id,
+                    full_name: client.full_name,
+                    email: client.email,
+                  }))}
+                />
               )}
             </div>
           </section>

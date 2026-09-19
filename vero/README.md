@@ -184,6 +184,15 @@ e2e/              # testes Playwright
   profissionais aprovados) ou pra uma lista manual de emails/números. Sem
   `BREVO_API_KEY`/`ZENVIA_API_TOKEN` configurados, o disparo roda normal
   mas mostra "não enviado" — mesmo padrão de fallback do resto do app
+- O profissional também tem marketing, dentro do próprio painel
+  `/p/[token]` — sem precisar sair da Vero nem abrir conta em nenhuma
+  plataforma externa: escolhe um modelo (convite pra agendar,
+  reengajamento de quem sumiu, ou cuidado com cliente ativo), marca quem
+  da própria lista de clientes recebe por email (ou cola números de quem
+  autorizou receber WhatsApp) e envia — usando a mesma integração
+  Brevo/Zenvia que o admin configura. A seção já vem com um guia curto de
+  "como funciona" e dicas de sucesso (personalização, frequência, LGPD no
+  WhatsApp, melhores horários)
 
 Tudo isso funciona sem quebrar mesmo sem alguma das chaves configurada:
 as rotas respondem 503 ou seguem em modo grátis/sem email, nunca com erro.
